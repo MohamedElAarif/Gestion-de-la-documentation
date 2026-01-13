@@ -9,4 +9,15 @@ class Rayonnage extends Model
 {
     protected $fillable = ['nom'];
     use HasFactory;
+
+    public function categories()
+    {
+        return $this->hasMany(Categorie::class);
+    }
+
+    // has many meaning through relationship to get documents through categories
+    public function documents()
+    {
+        return $this->hasManyThrough(Document::class, Categorie::class);
+    }
 }
