@@ -9,4 +9,10 @@ class Document extends Model
 {
     protected $fillable = ['titre','description','disponible'];
     use HasFactory;
+
+    public function categorie()
+    {
+        return $this->belongsTo(Categorie::class);
+    }
+
 }

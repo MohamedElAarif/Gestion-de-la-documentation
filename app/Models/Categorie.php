@@ -9,4 +9,14 @@ class Categorie extends Model
 {
     protected $fillable = ['nom','description'];
     use HasFactory;
+
+    public function rayonnage()
+    {
+        return $this->belongsTo(Rayonnage::class);
+    }
+
+    public function documents()
+    {
+        return $this->hasMany(Document::class);
+    }
 }
