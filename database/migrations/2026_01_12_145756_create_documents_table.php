@@ -13,13 +13,9 @@ return new class extends Migration
     {
         Schema::create('documents', function (Blueprint $table) {
             $table->id();
-            $table->string('titre')
-                ->nullable(false);
-            $table->text('description')
-                ->nullable();
-            $table->boolean('disponible')
-                ->nullable(false)
-                ->default(true);
+            $table->string('titre');
+            $table->text( 'description')->nullable();
+            $table->boolean('disponible')->default(true);
             $table->foreignId('rayonnage_id')
                 ->constrained('rayonnages')
                 ->cascadeOnDelete();
