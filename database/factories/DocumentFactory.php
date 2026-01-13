@@ -20,8 +20,8 @@ class DocumentFactory extends Factory
     public function definition(): array
     {
         return [
-            'titre' => fake()->sentence(5),
-            'description' => fake()->paragraph(10),
+            'titre' => fake()->sentence(1),
+            'description' => fake()->paragraph(1),
             'disponible' => fake()->boolean(70),
             'rayonnage_id' => Rayonnage::inRandomOrder()->first()->id,
             'categorie_id' => Categorie::inRandomOrder()->first()->id,
