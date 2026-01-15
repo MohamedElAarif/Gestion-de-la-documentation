@@ -7,8 +7,17 @@ use Illuminate\Database\Eloquent\Model;
 
 class Emprunt extends Model
 {
-    protected $fillable = ['date_emprunt','date_retour_prevue','date_retour','en_retard','notifie_retard'];
     use HasFactory;
+
+    protected $fillable = [
+        'date_emprunt',
+        'date_retour_prevue',
+        'date_retour',
+        'en_retard',
+        'notifie_retard',
+        'document_id',
+        'emprunteur_id',
+    ];
 
     public function document()
     {
