@@ -1,5 +1,5 @@
 import Layout from '../Layouts/Layout';
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from 'react';
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -11,129 +11,53 @@ import { Label } from "../ui/label";
 import { Plus, Search, Pencil, Trash2, ArrowUpDown } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
-interface LayoutProps {
-  children: ReactNode;
-}
-
 interface Document {
   id: number;
   titre: string;
-  description: string;
+  description?: string | null;
   disponible: boolean;
-  dateCreation: string;
-  dateModification: string;
-  rayonnage_id: number;
-  rayonnage: string;
-  categorie_id: number;
-  categorie: string;
-  type_id: number;
-  type: string;
+  dateCreation?: string | null;
+  dateModification?: string | null;
+  rayonnage_id?: number | null;
+  rayonnage?: string | null;
+  categorie_id?: number | null;
+  categorie?: string | null;
+  type_id?: number | null;
+  type?: string | null;
+}
+
+interface FilterOption {
+  id: number;
+  nom: string;
 }
 
 interface DocumentsListProps {
-  allDocuments: Document[];
+  allDocuments?: Document[];
+  rayonnages?: FilterOption[];
+  categories?: FilterOption[];
+  types?: FilterOption[];
+}
+function deriveOptions(
+  docs: Document[],
+  idKey: keyof Document,
+  nameKey: keyof Document
+): FilterOption[] {
+  const seen = new Map<number, string>();
+  docs.forEach((doc) => {
+    const identifier = doc[idKey];
+    if (typeof identifier === "number" && !seen.has(identifier)) {
+      const label = (doc[nameKey] as string | undefined)?.trim();
+      if (label) {
+        seen.set(identifier, label);
+      }
+    }
+  });
+  return Array.from(seen.entries()).map(([id, nom]) => ({ id, nom }));
 }
 
-const initialMockDocuments = [
-  {
-    id: 1,
-    titre: "Introduction à l'informatique",
-    description: "Un guide complet pour débutants",
-    disponible: true,
-    dateCreation: "2025-06-15",
-    dateModification: "2025-12-20",
-    rayonnage_id: 5,
-    rayonnage: "Section E - Technologie",
-    categorie_id: 5,
-    categorie: "Technologie",
-    type_id: 1,
-    type: "Livre",
-  },
-  {
-    id: 2,
-    titre: "Histoire du Maroc",
-    description: "L'histoire complète du royaume",
-    disponible: true,
-    dateCreation: "2025-07-10",
-    dateModification: "2025-11-05",
-    rayonnage_id: 2,
-    rayonnage: "Section B - Histoire",
-    categorie_id: 2,
-    categorie: "Histoire",
-    type_id: 1,
-    type: "Livre",
-  },
-  {
-    id: 3,
-    titre: "Mathématiques avancées",
-    description: "Algèbre et analyse",
-    disponible: false,
-    dateCreation: "2025-08-20",
-    dateModification: "2025-12-30",
-    rayonnage_id: 1,
-    rayonnage: "Section A - Sciences",
-    categorie_id: 1,
-    categorie: "Sciences",
-    type_id: 1,
-    type: "Livre",
-  },
-  {
-    id: 4,
-    titre: "Physique quantique",
-    description: "Introduction à la physique moderne",
-    disponible: true,
-    dateCreation: "2025-09-05",
-    dateModification: "2026-01-02",
-    rayonnage_id: 1,
-    rayonnage: "Section A - Sciences",
-    categorie_id: 1,
-    categorie: "Sciences",
-    type_id: 3,
-    type: "Thèse",
-  },
-  {
-    id: 5,
-    titre: "Littérature française",
-    description: "Grands classiques de la littérature",
-    disponible: true,
-    dateCreation: "2025-05-12",
-    dateModification: "2025-10-18",
-    rayonnage_id: 3,
-    rayonnage: "Section C - Littérature",
-    categorie_id: 3,
-    categorie: "Littérature",
-    type_id: 5,
-    type: "E-book",
-  },
-];
-
-// Mock data for filters
-const mockRayonnages = [
-  { id: 1, nom: "Section A - Sciences" },
-  { id: 2, nom: "Section B - Histoire" },
-  { id: 3, nom: "Section C - Littérature" },
-  { id: 4, nom: "Section D - Arts" },
-  { id: 5, nom: "Section E - Technologie" },
-];
-
-const mockCategories = [
-  { id: 1, nom: "Sciences" },
-  { id: 2, nom: "Histoire" },
-  { id: 3, nom: "Littérature" },
-  { id: 4, nom: "Arts" },
-  { id: 5, nom: "Technologie" },
-];
-
-const mockTypes = [
-  { id: 1, nom: "Livre" },
-  { id: 2, nom: "Magazine" },
-  { id: 3, nom: "Thèse" },
-  { id: 4, nom: "DVD" },
-  { id: 5, nom: "E-book" },
-];
-
-export function DocumentsList({allDocuments}:DocumentsListProps) {
-  const [documents, setDocuments] = useState(allDocuments);
+export function DocumentsList({ allDocuments, rayonnages, categories, types }: DocumentsListProps) {
+  const initialDocuments = useMemo(() => (Array.isArray(allDocuments) ? allDocuments : []), [allDocuments]);
+  const [documents, setDocuments] = useState<Document[]>(initialDocuments);
   const [searchQuery, setSearchQuery] = useState("");
   const [availabilityFilter, setAvailabilityFilter] = useState("all");
   const [rayonnageFilter, setRayonnageFilter] = useState("all");
@@ -147,6 +71,31 @@ export function DocumentsList({allDocuments}:DocumentsListProps) {
     titre: "",
     description: "",
   });
+
+  useEffect(() => {
+    setDocuments(initialDocuments);
+  }, [initialDocuments]);
+
+  const rayonnageOptions = useMemo(() => {
+    if (Array.isArray(rayonnages) && rayonnages.length > 0) {
+      return rayonnages;
+    }
+    return deriveOptions(initialDocuments, "rayonnage_id", "rayonnage");
+  }, [rayonnages, initialDocuments]);
+
+  const categorieOptions = useMemo(() => {
+    if (Array.isArray(categories) && categories.length > 0) {
+      return categories;
+    }
+    return deriveOptions(initialDocuments, "categorie_id", "categorie");
+  }, [categories, initialDocuments]);
+
+  const typeOptions = useMemo(() => {
+    if (Array.isArray(types) && types.length > 0) {
+      return types;
+    }
+    return deriveOptions(initialDocuments, "type_id", "type");
+  }, [types, initialDocuments]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -166,8 +115,12 @@ export function DocumentsList({allDocuments}:DocumentsListProps) {
       console.log("Document modifié:", formData);
     } else {
       // Add new document
-      const newId = Math.max(...documents.map(d => d.id)) + 1;
+      const maxId = documents.reduce((max, doc) => (doc.id > max ? doc.id : max), 0);
+      const newId = maxId + 1;
       const today = new Date().toISOString().split('T')[0];
+      const defaultRayonnage = rayonnageOptions[0];
+      const defaultCategorie = categorieOptions[0];
+      const defaultType = typeOptions[0];
       const newDocument = {
         id: newId,
         titre: formData.titre,
@@ -175,12 +128,12 @@ export function DocumentsList({allDocuments}:DocumentsListProps) {
         disponible: true,
         dateCreation: today,
         dateModification: today,
-        rayonnage_id: 1,
-        rayonnage: "Section A - Sciences",
-        categorie_id: 1,
-        categorie: "Sciences",
-        type_id: 1,
-        type: "Livre",
+        rayonnage_id: defaultRayonnage?.id ?? null,
+        rayonnage: defaultRayonnage?.nom ?? '',
+        categorie_id: defaultCategorie?.id ?? null,
+        categorie: defaultCategorie?.nom ?? '',
+        type_id: defaultType?.id ?? null,
+        type: defaultType?.nom ?? '',
       };
       setDocuments([...documents, newDocument]);
       console.log("Nouveau document:", newDocument);
@@ -218,14 +171,14 @@ export function DocumentsList({allDocuments}:DocumentsListProps) {
   // Filter and sort documents
   let filteredDocuments = documents.filter(
     (doc) =>
-      (doc.titre.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      doc.description.toLowerCase().includes(searchQuery.toLowerCase())) &&
+    ((doc.titre ?? '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (doc.description ?? '').toLowerCase().includes(searchQuery.toLowerCase())) &&
       (availabilityFilter === "all" || 
        (availabilityFilter === "disponible" && doc.disponible) ||
        (availabilityFilter === "emprunte" && !doc.disponible)) &&
-      (rayonnageFilter === "all" || doc.rayonnage_id.toString() === rayonnageFilter) &&
-      (categorieFilter === "all" || doc.categorie_id.toString() === categorieFilter) &&
-      (typeFilter === "all" || doc.type_id.toString() === typeFilter)
+    (rayonnageFilter === "all" || (doc.rayonnage_id ?? '').toString() === rayonnageFilter) &&
+    (categorieFilter === "all" || (doc.categorie_id ?? '').toString() === categorieFilter) &&
+    (typeFilter === "all" || (doc.type_id ?? '').toString() === typeFilter)
   );
 
   // Sort documents
@@ -291,7 +244,7 @@ export function DocumentsList({allDocuments}:DocumentsListProps) {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Tous les rayonnages</SelectItem>
-                {mockRayonnages.map((ray) => (
+                {rayonnageOptions.map((ray) => (
                   <SelectItem key={ray.id} value={ray.id.toString()}>
                     {ray.nom}
                   </SelectItem>
@@ -304,7 +257,7 @@ export function DocumentsList({allDocuments}:DocumentsListProps) {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Toutes les catégories</SelectItem>
-                {mockCategories.map((cat) => (
+                {categorieOptions.map((cat) => (
                   <SelectItem key={cat.id} value={cat.id.toString()}>
                     {cat.nom}
                   </SelectItem>
@@ -317,7 +270,7 @@ export function DocumentsList({allDocuments}:DocumentsListProps) {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Tous les types</SelectItem>
-                {mockTypes.map((type) => (
+                {typeOptions.map((type) => (
                   <SelectItem key={type.id} value={type.id.toString()}>
                     {type.nom}
                   </SelectItem>
@@ -354,11 +307,11 @@ export function DocumentsList({allDocuments}:DocumentsListProps) {
                   <TableRow key={doc.id}>
                     <TableCell>{doc.id}</TableCell>
                     <TableCell className="font-medium">{doc.titre}</TableCell>
-                    <TableCell>{doc.description}</TableCell>
-                    <TableCell>{doc.rayonnage}</TableCell>
-                    <TableCell>{doc.categorie}</TableCell>
-                    <TableCell>{doc.type}</TableCell>
-                    <TableCell>{doc.dateCreation}</TableCell>
+                    <TableCell>{doc.description ?? '—'}</TableCell>
+                    <TableCell>{doc.rayonnage ?? '—'}</TableCell>
+                    <TableCell>{doc.categorie ?? '—'}</TableCell>
+                    <TableCell>{doc.type ?? '—'}</TableCell>
+                    <TableCell>{doc.dateCreation ?? '—'}</TableCell>
                     <TableCell>
                       <Badge variant={doc.disponible ? "default" : "destructive"}>
                         {doc.disponible ? "Disponible" : "Emprunté"}
