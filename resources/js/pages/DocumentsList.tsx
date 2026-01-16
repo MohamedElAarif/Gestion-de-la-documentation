@@ -133,6 +133,7 @@ const mockTypes = [
 ];
 
 export function DocumentsList({allDocuments}:DocumentsListProps) {
+  console.log(allDocuments)
   const [documents, setDocuments] = useState(allDocuments);
   const [searchQuery, setSearchQuery] = useState("");
   const [availabilityFilter, setAvailabilityFilter] = useState("all");
@@ -355,10 +356,10 @@ export function DocumentsList({allDocuments}:DocumentsListProps) {
                     <TableCell>{doc.id}</TableCell>
                     <TableCell className="font-medium">{doc.titre}</TableCell>
                     <TableCell>{doc.description}</TableCell>
-                    <TableCell>{doc.rayonnage}</TableCell>
-                    <TableCell>{doc.categorie}</TableCell>
-                    <TableCell>{doc.type}</TableCell>
-                    <TableCell>{doc.dateCreation}</TableCell>
+                    <TableCell>{doc.categorie.rayonnage.nom}</TableCell>
+                    <TableCell>{doc.categorie.nom}</TableCell>
+                    <TableCell>{doc.type_document?.nom}</TableCell>
+                    <TableCell>{doc.updated_at.split('T')[0]}</TableCell>
                     <TableCell>
                       <Badge variant={doc.disponible ? "default" : "destructive"}>
                         {doc.disponible ? "Disponible" : "Emprunté"}

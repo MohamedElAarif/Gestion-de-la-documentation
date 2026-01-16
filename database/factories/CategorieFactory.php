@@ -18,8 +18,8 @@ class CategorieFactory extends Factory
     public function definition(): array
     {
         return [
-            'nom' => fake()->sentence(2),
-            'description' => fake()->paragraph(10),
+            'nom' => fake()->sentence(1),
+            'description' => fake()->paragraph(1),
             'rayonnage_id' => Rayonnage::inRandomOrder()->first()->id,
         ];
     }
