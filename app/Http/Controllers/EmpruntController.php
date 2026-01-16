@@ -100,10 +100,17 @@ class EmpruntController extends Controller
         $emprunteur = $e->emprunteur ?? null;
         $emprunteurName = '';
         if (is_object($emprunteur)) {
-            $emprunteurName = $emprunteur->nom
-                ?? $emprunteur->name
-                ?? $emprunteur->prenom
-                ?? '';
+            $parts = [];
+            if (!empty($emprunteur->nom)) {
+                $parts[] = $emprunteur->nom;
+            }
+            if (!empty($emprunteur->prenom)) {
+                $parts[] = $emprunteur->prenom;
+            }
+            $emprunteurName = trim(implode(' ', $parts));
+            if ($emprunteurName === '' && !empty($emprunteur->name)) {
+                $emprunteurName = $emprunteur->name;
+            }
         } else {
             $emprunteurName = (string) ($emprunteur ?? '');
         }
@@ -183,7 +190,6 @@ class EmpruntController extends Controller
             'date_retour_prevue' => 'required|date|after_or_equal:date_emprunt',
         ]);
 
-        // If the client supplied only labels (free text), search for existing records before creating new ones.
         $documentId = $data['document_id'] ?? null;
         if (empty($documentId) && !empty($data['document_label'])) {
             $documentLabel = trim($data['document_label']);
