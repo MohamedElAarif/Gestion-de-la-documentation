@@ -21,7 +21,7 @@ class DocumentFactory extends Factory
     {
         return [
             'titre' => fake()->sentence(1),
-            'description' => fake()->paragraph(1),
+            'description' => fake()->paragraph(0.5),
             'disponible' => fake()->boolean(70),
             'rayonnage_id' => Rayonnage::inRandomOrder()->first()->id,
             'categorie_id' => Categorie::inRandomOrder()->first()->id,
