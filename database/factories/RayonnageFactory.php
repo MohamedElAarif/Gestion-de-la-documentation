@@ -17,7 +17,7 @@ class RayonnageFactory extends Factory
     public function definition(): array
     {
         return [
-            'nom' => fake()->sentence(2),
+            'nom' => fake()->sentence(1),
         ];
     }
 }

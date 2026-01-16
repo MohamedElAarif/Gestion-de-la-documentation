@@ -1,5 +1,5 @@
 import Layout from '../Layouts/Layout';
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from 'react';
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -11,29 +11,55 @@ import { Label } from "../ui/label";
 import { Plus, Search, Pencil, Trash2, ArrowUpDown } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 
-interface LayoutProps {
-  children: ReactNode;
-}
-
 interface Document {
   id: number;
   titre: string;
-  description: string;
+  description?: string | null;
   disponible: boolean;
-  dateCreation: string;
-  dateModification: string;
-  rayonnage_id: number;
-  rayonnage: string;
-  categorie_id: number;
-  categorie: string;
-  type_id: number;
-  type: string;
+  dateCreation?: string | null;
+  dateModification?: string | null;
+  rayonnage_id?: number | null;
+  rayonnage?: string | null;
+  categorie_id?: number | null;
+  categorie?: string | null;
+  type_id?: number | null;
+  type?: string | null;
+}
+
+interface FilterOption {
+  id: number;
+  nom: string;
 }
 
 interface DocumentsListProps {
-  allDocuments: Document[];
+  allDocuments?: Document[];
+  rayonnages?: FilterOption[];
+  categories?: FilterOption[];
+  types?: FilterOption[];
+}
+function deriveOptions(
+  docs: Document[],
+  idKey: keyof Document,
+  nameKey: keyof Document
+): FilterOption[] {
+  const seen = new Map<number, string>();
+  docs.forEach((doc) => {
+    const identifier = doc[idKey];
+    if (typeof identifier === "number" && !seen.has(identifier)) {
+      const label = (doc[nameKey] as string | undefined)?.trim();
+      if (label) {
+        seen.set(identifier, label);
+      }
+    }
+  });
+  return Array.from(seen.entries()).map(([id, nom]) => ({ id, nom }));
 }
 
+<<<<<<< HEAD
+export function DocumentsList({ allDocuments, rayonnages, categories, types }: DocumentsListProps) {
+  const initialDocuments = useMemo(() => (Array.isArray(allDocuments) ? allDocuments : []), [allDocuments]);
+  const [documents, setDocuments] = useState<Document[]>(initialDocuments);
+=======
 const initialMockDocuments = [
   {
     id: 1,
@@ -133,7 +159,9 @@ const mockTypes = [
 ];
 
 export function DocumentsList({allDocuments}:DocumentsListProps) {
+  console.log(allDocuments)
   const [documents, setDocuments] = useState(allDocuments);
+>>>>>>> 8bb6be9804b2a0eee556b335d114bded311f1635
   const [searchQuery, setSearchQuery] = useState("");
   const [availabilityFilter, setAvailabilityFilter] = useState("all");
   const [rayonnageFilter, setRayonnageFilter] = useState("all");
@@ -147,6 +175,31 @@ export function DocumentsList({allDocuments}:DocumentsListProps) {
     titre: "",
     description: "",
   });
+
+  useEffect(() => {
+    setDocuments(initialDocuments);
+  }, [initialDocuments]);
+
+  const rayonnageOptions = useMemo(() => {
+    if (Array.isArray(rayonnages) && rayonnages.length > 0) {
+      return rayonnages;
+    }
+    return deriveOptions(initialDocuments, "rayonnage_id", "rayonnage");
+  }, [rayonnages, initialDocuments]);
+
+  const categorieOptions = useMemo(() => {
+    if (Array.isArray(categories) && categories.length > 0) {
+      return categories;
+    }
+    return deriveOptions(initialDocuments, "categorie_id", "categorie");
+  }, [categories, initialDocuments]);
+
+  const typeOptions = useMemo(() => {
+    if (Array.isArray(types) && types.length > 0) {
+      return types;
+    }
+    return deriveOptions(initialDocuments, "type_id", "type");
+  }, [types, initialDocuments]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -166,8 +219,12 @@ export function DocumentsList({allDocuments}:DocumentsListProps) {
       console.log("Document modifié:", formData);
     } else {
       // Add new document
-      const newId = Math.max(...documents.map(d => d.id)) + 1;
+      const maxId = documents.reduce((max, doc) => (doc.id > max ? doc.id : max), 0);
+      const newId = maxId + 1;
       const today = new Date().toISOString().split('T')[0];
+      const defaultRayonnage = rayonnageOptions[0];
+      const defaultCategorie = categorieOptions[0];
+      const defaultType = typeOptions[0];
       const newDocument = {
         id: newId,
         titre: formData.titre,
@@ -175,12 +232,12 @@ export function DocumentsList({allDocuments}:DocumentsListProps) {
         disponible: true,
         dateCreation: today,
         dateModification: today,
-        rayonnage_id: 1,
-        rayonnage: "Section A - Sciences",
-        categorie_id: 1,
-        categorie: "Sciences",
-        type_id: 1,
-        type: "Livre",
+        rayonnage_id: defaultRayonnage?.id ?? null,
+        rayonnage: defaultRayonnage?.nom ?? '',
+        categorie_id: defaultCategorie?.id ?? null,
+        categorie: defaultCategorie?.nom ?? '',
+        type_id: defaultType?.id ?? null,
+        type: defaultType?.nom ?? '',
       };
       setDocuments([...documents, newDocument]);
       console.log("Nouveau document:", newDocument);
@@ -218,14 +275,14 @@ export function DocumentsList({allDocuments}:DocumentsListProps) {
   // Filter and sort documents
   let filteredDocuments = documents.filter(
     (doc) =>
-      (doc.titre.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      doc.description.toLowerCase().includes(searchQuery.toLowerCase())) &&
+    ((doc.titre ?? '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (doc.description ?? '').toLowerCase().includes(searchQuery.toLowerCase())) &&
       (availabilityFilter === "all" || 
        (availabilityFilter === "disponible" && doc.disponible) ||
        (availabilityFilter === "emprunte" && !doc.disponible)) &&
-      (rayonnageFilter === "all" || doc.rayonnage_id.toString() === rayonnageFilter) &&
-      (categorieFilter === "all" || doc.categorie_id.toString() === categorieFilter) &&
-      (typeFilter === "all" || doc.type_id.toString() === typeFilter)
+    (rayonnageFilter === "all" || (doc.rayonnage_id ?? '').toString() === rayonnageFilter) &&
+    (categorieFilter === "all" || (doc.categorie_id ?? '').toString() === categorieFilter) &&
+    (typeFilter === "all" || (doc.type_id ?? '').toString() === typeFilter)
   );
 
   // Sort documents
@@ -291,7 +348,7 @@ export function DocumentsList({allDocuments}:DocumentsListProps) {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Tous les rayonnages</SelectItem>
-                {mockRayonnages.map((ray) => (
+                {rayonnageOptions.map((ray) => (
                   <SelectItem key={ray.id} value={ray.id.toString()}>
                     {ray.nom}
                   </SelectItem>
@@ -304,7 +361,7 @@ export function DocumentsList({allDocuments}:DocumentsListProps) {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Toutes les catégories</SelectItem>
-                {mockCategories.map((cat) => (
+                {categorieOptions.map((cat) => (
                   <SelectItem key={cat.id} value={cat.id.toString()}>
                     {cat.nom}
                   </SelectItem>
@@ -317,7 +374,7 @@ export function DocumentsList({allDocuments}:DocumentsListProps) {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Tous les types</SelectItem>
-                {mockTypes.map((type) => (
+                {typeOptions.map((type) => (
                   <SelectItem key={type.id} value={type.id.toString()}>
                     {type.nom}
                   </SelectItem>
@@ -354,11 +411,19 @@ export function DocumentsList({allDocuments}:DocumentsListProps) {
                   <TableRow key={doc.id}>
                     <TableCell>{doc.id}</TableCell>
                     <TableCell className="font-medium">{doc.titre}</TableCell>
+<<<<<<< HEAD
+                    <TableCell>{doc.description ?? '—'}</TableCell>
+                    <TableCell>{doc.rayonnage ?? '—'}</TableCell>
+                    <TableCell>{doc.categorie ?? '—'}</TableCell>
+                    <TableCell>{doc.type ?? '—'}</TableCell>
+                    <TableCell>{doc.dateCreation ?? '—'}</TableCell>
+=======
                     <TableCell>{doc.description}</TableCell>
-                    <TableCell>{doc.rayonnage}</TableCell>
-                    <TableCell>{doc.categorie}</TableCell>
-                    <TableCell>{doc.type}</TableCell>
-                    <TableCell>{doc.dateCreation}</TableCell>
+                    <TableCell>{doc.categorie.rayonnage.nom}</TableCell>
+                    <TableCell>{doc.categorie.nom}</TableCell>
+                    <TableCell>{doc.type_document?.nom}</TableCell>
+                    <TableCell>{doc.updated_at.split('T')[0]}</TableCell>
+>>>>>>> 8bb6be9804b2a0eee556b335d114bded311f1635
                     <TableCell>
                       <Badge variant={doc.disponible ? "default" : "destructive"}>
                         {doc.disponible ? "Disponible" : "Emprunté"}

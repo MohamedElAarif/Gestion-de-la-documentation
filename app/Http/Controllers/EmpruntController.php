@@ -181,7 +181,7 @@ class EmpruntController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        $data = $request->validate([
+    $data = $request->validate([
             'document_id' => 'nullable|exists:documents,id',
             'document_label' => 'nullable|string|max:255|required_without:document_id',
             'emprunteur_id' => 'nullable|exists:membres,id',
@@ -190,6 +190,7 @@ class EmpruntController extends Controller
             'date_retour_prevue' => 'required|date|after_or_equal:date_emprunt',
         ]);
 
+    // If the client supplied only labels (free text), search for existing records before creating new ones.
         $documentId = $data['document_id'] ?? null;
         if (empty($documentId) && !empty($data['document_label'])) {
             $documentLabel = trim($data['document_label']);
