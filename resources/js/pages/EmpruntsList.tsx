@@ -492,7 +492,7 @@ export default function EmpruntsList(): React.JSX.Element {
                     <TableHead>Date retour prévue</TableHead>
                     <TableHead>Date retour réelle</TableHead>
                     <TableHead>Statut</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableHead className="w-48 pr-4 text-center align-middle">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -510,8 +510,8 @@ export default function EmpruntsList(): React.JSX.Element {
                         <TableCell>{e.date_retour_prevue ?? "-"}</TableCell>
                         <TableCell>{e.date_retour_reelle ?? "-"}</TableCell>
                         <TableCell><Badge variant={e.status === "En cours" ? "default" : "secondary"}>{e.status}</Badge></TableCell>
-                        <TableCell>
-                          <div className="flex gap-2">
+                        <TableCell className="pr-4 align-middle">
+                          <div className="flex justify-end gap-2">
                             {e.status === "En cours" && (
                               <Button variant="ghost" size="sm" onClick={() => void markReturned(e.id)} title="Marquer comme retourné"><CheckCircle className="w-4 h-4 text-green-600" /></Button>
                             )}
