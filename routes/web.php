@@ -9,7 +9,10 @@ Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
 
-Route::get('/Documents',[DocumentController::class, 'index']);
+Route::get('/Documents', [DocumentController::class, 'index'])->name('documents');
+Route::post('/Documents', [DocumentController::class, 'store'])->name('documents.store');
+Route::put('/Documents/{id}', [DocumentController::class, 'update'])->name('documents.update');
+Route::delete('/Documents/{id}', [DocumentController::class, 'destroy'])->name('documents.destroy');
 
 // Route::get('/Documents', function () {
 //     return Inertia::render('DocumentsList');

@@ -13,6 +13,6 @@ class Type_Document extends Model
 
     public function documents()
     {
-        return $this->hasMany(Document::class);
+        return $this->hasMany(Document::class,'type_id');
     }
 }
