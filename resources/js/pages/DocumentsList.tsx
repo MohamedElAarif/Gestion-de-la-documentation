@@ -37,6 +37,7 @@ interface DocumentsListProps {
   categories?: FilterOption[];
   types?: FilterOption[];
 }
+
 function deriveOptions(
   docs: Document[],
   idKey: keyof Document,
@@ -55,113 +56,9 @@ function deriveOptions(
   return Array.from(seen.entries()).map(([id, nom]) => ({ id, nom }));
 }
 
-<<<<<<< HEAD
 export function DocumentsList({ allDocuments, rayonnages, categories, types }: DocumentsListProps) {
   const initialDocuments = useMemo(() => (Array.isArray(allDocuments) ? allDocuments : []), [allDocuments]);
   const [documents, setDocuments] = useState<Document[]>(initialDocuments);
-=======
-const initialMockDocuments = [
-  {
-    id: 1,
-    titre: "Introduction à l'informatique",
-    description: "Un guide complet pour débutants",
-    disponible: true,
-    dateCreation: "2025-06-15",
-    dateModification: "2025-12-20",
-    rayonnage_id: 5,
-    rayonnage: "Section E - Technologie",
-    categorie_id: 5,
-    categorie: "Technologie",
-    type_id: 1,
-    type: "Livre",
-  },
-  {
-    id: 2,
-    titre: "Histoire du Maroc",
-    description: "L'histoire complète du royaume",
-    disponible: true,
-    dateCreation: "2025-07-10",
-    dateModification: "2025-11-05",
-    rayonnage_id: 2,
-    rayonnage: "Section B - Histoire",
-    categorie_id: 2,
-    categorie: "Histoire",
-    type_id: 1,
-    type: "Livre",
-  },
-  {
-    id: 3,
-    titre: "Mathématiques avancées",
-    description: "Algèbre et analyse",
-    disponible: false,
-    dateCreation: "2025-08-20",
-    dateModification: "2025-12-30",
-    rayonnage_id: 1,
-    rayonnage: "Section A - Sciences",
-    categorie_id: 1,
-    categorie: "Sciences",
-    type_id: 1,
-    type: "Livre",
-  },
-  {
-    id: 4,
-    titre: "Physique quantique",
-    description: "Introduction à la physique moderne",
-    disponible: true,
-    dateCreation: "2025-09-05",
-    dateModification: "2026-01-02",
-    rayonnage_id: 1,
-    rayonnage: "Section A - Sciences",
-    categorie_id: 1,
-    categorie: "Sciences",
-    type_id: 3,
-    type: "Thèse",
-  },
-  {
-    id: 5,
-    titre: "Littérature française",
-    description: "Grands classiques de la littérature",
-    disponible: true,
-    dateCreation: "2025-05-12",
-    dateModification: "2025-10-18",
-    rayonnage_id: 3,
-    rayonnage: "Section C - Littérature",
-    categorie_id: 3,
-    categorie: "Littérature",
-    type_id: 5,
-    type: "E-book",
-  },
-];
-
-// Mock data for filters
-const mockRayonnages = [
-  { id: 1, nom: "Section A - Sciences" },
-  { id: 2, nom: "Section B - Histoire" },
-  { id: 3, nom: "Section C - Littérature" },
-  { id: 4, nom: "Section D - Arts" },
-  { id: 5, nom: "Section E - Technologie" },
-];
-
-const mockCategories = [
-  { id: 1, nom: "Sciences" },
-  { id: 2, nom: "Histoire" },
-  { id: 3, nom: "Littérature" },
-  { id: 4, nom: "Arts" },
-  { id: 5, nom: "Technologie" },
-];
-
-const mockTypes = [
-  { id: 1, nom: "Livre" },
-  { id: 2, nom: "Magazine" },
-  { id: 3, nom: "Thèse" },
-  { id: 4, nom: "DVD" },
-  { id: 5, nom: "E-book" },
-];
-
-export function DocumentsList({allDocuments}:DocumentsListProps) {
-  console.log(allDocuments)
-  const [documents, setDocuments] = useState(allDocuments);
->>>>>>> 8bb6be9804b2a0eee556b335d114bded311f1635
   const [searchQuery, setSearchQuery] = useState("");
   const [availabilityFilter, setAvailabilityFilter] = useState("all");
   const [rayonnageFilter, setRayonnageFilter] = useState("all");
@@ -411,19 +308,11 @@ export function DocumentsList({allDocuments}:DocumentsListProps) {
                   <TableRow key={doc.id}>
                     <TableCell>{doc.id}</TableCell>
                     <TableCell className="font-medium">{doc.titre}</TableCell>
-<<<<<<< HEAD
                     <TableCell>{doc.description ?? '—'}</TableCell>
                     <TableCell>{doc.rayonnage ?? '—'}</TableCell>
                     <TableCell>{doc.categorie ?? '—'}</TableCell>
                     <TableCell>{doc.type ?? '—'}</TableCell>
                     <TableCell>{doc.dateCreation ?? '—'}</TableCell>
-=======
-                    <TableCell>{doc.description}</TableCell>
-                    <TableCell>{doc.categorie.rayonnage.nom}</TableCell>
-                    <TableCell>{doc.categorie.nom}</TableCell>
-                    <TableCell>{doc.type_document?.nom}</TableCell>
-                    <TableCell>{doc.updated_at.split('T')[0]}</TableCell>
->>>>>>> 8bb6be9804b2a0eee556b335d114bded311f1635
                     <TableCell>
                       <Badge variant={doc.disponible ? "default" : "destructive"}>
                         {doc.disponible ? "Disponible" : "Emprunté"}
