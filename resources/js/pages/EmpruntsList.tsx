@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { usePage } from "@inertiajs/react";
+import { router, useForm, usePage } from "@inertiajs/react";
 import Layout from "../Layouts/Layout";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -150,26 +150,24 @@ export default function EmpruntsList(): React.JSX.Element {
     retard_notifie: false,
   });
 
-  const [createForm, setCreateForm] = useState({
+  const initialDate = useMemo(() => new Date().toISOString().slice(0, 10), []);
+  const createForm = useForm({
     document_id: "",
+    document_label: "",
     emprunteur_id: "",
-    date_emprunt: new Date().toISOString().slice(0, 10),
-    date_retour_prevue: new Date().toISOString().slice(0, 10),
-  });
-  // allow free-text input alongside selects
-  const [createFormText, setCreateFormText] = useState({
-    document_text: "",
-    emprunteur_text: "",
+    emprunteur_label: "",
+    date_emprunt: initialDate,
+    date_retour_prevue: initialDate,
   });
 
   const handleDocumentTextChange = (value: string) => {
-    setCreateFormText((prev) => ({ ...prev, document_text: value }));
-    setCreateForm((prev) => ({ ...prev, document_id: "" }));
+    createForm.setData("document_label", value);
+    createForm.setData("document_id", "");
   };
 
   const handleEmprunteurTextChange = (value: string) => {
-    setCreateFormText((prev) => ({ ...prev, emprunteur_text: value }));
-    setCreateForm((prev) => ({ ...prev, emprunteur_id: "" }));
+    createForm.setData("emprunteur_label", value);
+    createForm.setData("emprunteur_id", "");
   };
 
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -253,11 +251,6 @@ export default function EmpruntsList(): React.JSX.Element {
     }
   };
 
-  const createEmprunt = async (payload: Partial<EmpruntItem>) => {
-    await fetchJson("/Emprunts", "POST", payload);
-    await reload();
-  };
-
   const updateEmprunt = async (id: number, payload: Partial<EmpruntItem>) => {
     await fetchJson(`/Emprunts/${id}`, "PUT", payload);
     await reload();
@@ -276,12 +269,10 @@ export default function EmpruntsList(): React.JSX.Element {
 
   const openCreateModal = () => {
     void fetchOptions();
-    setCreateForm((prev) => ({
-      document_id: prev.document_id || "",
-      emprunteur_id: prev.emprunteur_id || "",
-      date_emprunt: prev.date_emprunt || new Date().toISOString().slice(0, 10),
-      date_retour_prevue: prev.date_retour_prevue || new Date().toISOString().slice(0, 10),
-    }));
+    createForm.setData("document_id", createForm.data.document_id || "");
+    createForm.setData("emprunteur_id", createForm.data.emprunteur_id || "");
+    createForm.setData("date_emprunt", createForm.data.date_emprunt || new Date().toISOString().slice(0, 10));
+    createForm.setData("date_retour_prevue", createForm.data.date_retour_prevue || new Date().toISOString().slice(0, 10));
     setIsCreateOpen(true);
   };
 
@@ -319,12 +310,24 @@ export default function EmpruntsList(): React.JSX.Element {
     closeEditModal();
   };
 
+  const resetCreateForm = () => {
+    const today = new Date().toISOString().slice(0, 10);
+    createForm.setData({
+      document_id: "",
+      document_label: "",
+      emprunteur_id: "",
+      emprunteur_label: "",
+      date_emprunt: today,
+      date_retour_prevue: today,
+    });
+  };
+
   const handleCreateSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    let documentId = createForm.document_id;
-    let emprunteurId = createForm.emprunteur_id;
-    let documentLabel = (createFormText.document_text || "").trim();
-    let emprunteurLabel = (createFormText.emprunteur_text || "").trim();
+    let documentId = createForm.data.document_id;
+    let emprunteurId = createForm.data.emprunteur_id;
+    let documentLabel = (createForm.data.document_label || "").trim();
+    let emprunteurLabel = (createForm.data.emprunteur_label || "").trim();
 
     if (!documentId && documentLabel) {
       const existingDoc = documentOptions.find((doc) => doc.label.toLowerCase() === documentLabel.toLowerCase());
@@ -356,9 +359,9 @@ export default function EmpruntsList(): React.JSX.Element {
       return;
     }
 
-    if (createForm.date_retour_prevue && createForm.date_emprunt) {
-      const dRetour = new Date(createForm.date_retour_prevue).setHours(0, 0, 0, 0);
-      const dEmprunt = new Date(createForm.date_emprunt).setHours(0, 0, 0, 0);
+    if (createForm.data.date_retour_prevue && createForm.data.date_emprunt) {
+      const dRetour = new Date(createForm.data.date_retour_prevue).setHours(0, 0, 0, 0);
+      const dEmprunt = new Date(createForm.data.date_emprunt).setHours(0, 0, 0, 0);
       if (dRetour < dEmprunt) {
         alert("La date de retour prévue ne peut pas être antérieure à la date d'emprunt.");
         return;
@@ -366,8 +369,8 @@ export default function EmpruntsList(): React.JSX.Element {
     }
 
     const payload: any = {
-      date_emprunt: createForm.date_emprunt,
-      date_retour_prevue: createForm.date_retour_prevue,
+      date_emprunt: createForm.data.date_emprunt,
+      date_retour_prevue: createForm.data.date_retour_prevue,
     };
     if (hasDocumentId) payload.document_id = Number(documentId);
     else payload.document_label = documentLabel;
@@ -375,17 +378,16 @@ export default function EmpruntsList(): React.JSX.Element {
     if (hasMembreId) payload.emprunteur_id = Number(emprunteurId);
     else payload.emprunteur_label = emprunteurLabel;
 
-    await createEmprunt(payload);
-    await fetchOptions();
-
-    setCreateForm({
-      document_id: "",
-      emprunteur_id: "",
-      date_emprunt: new Date().toISOString().slice(0, 10),
-      date_retour_prevue: new Date().toISOString().slice(0, 10),
-    });
-    setCreateFormText({ document_text: "", emprunteur_text: "" });
-    closeCreateModal();
+    try {
+      await fetchJson("/Emprunts", "POST", payload);
+      await reload();
+      await fetchOptions();
+      resetCreateForm();
+      closeCreateModal();
+    } catch (error) {
+      console.error("Erreur lors de la création de l'emprunt", error);
+      alert("Impossible de créer l'emprunt. Veuillez réessayer.");
+    }
   };
 
   const filtered = useMemo(() => {
@@ -540,12 +542,12 @@ export default function EmpruntsList(): React.JSX.Element {
               label="Document"
               placeholder="Chercher ou saisir un document"
               options={documentOptions}
-              textValue={createFormText.document_text}
-              selectedId={createForm.document_id}
+              textValue={createForm.data.document_label}
+              selectedId={createForm.data.document_id}
               onTextChange={handleDocumentTextChange}
               onSelectOption={(option) => {
-                setCreateFormText((prev) => ({ ...prev, document_text: option.label }));
-                setCreateForm((prev) => ({ ...prev, document_id: String(option.id) }));
+                createForm.setData("document_id", String(option.id));
+                createForm.setData("document_label", option.label);
               }}
             />
 
@@ -553,12 +555,12 @@ export default function EmpruntsList(): React.JSX.Element {
               label="Emprunteur"
               placeholder="Chercher ou saisir un emprunteur"
               options={membreOptions}
-              textValue={createFormText.emprunteur_text}
-              selectedId={createForm.emprunteur_id}
+              textValue={createForm.data.emprunteur_label}
+              selectedId={createForm.data.emprunteur_id}
               onTextChange={handleEmprunteurTextChange}
               onSelectOption={(option) => {
-                setCreateFormText((prev) => ({ ...prev, emprunteur_text: option.label }));
-                setCreateForm((prev) => ({ ...prev, emprunteur_id: String(option.id) }));
+                createForm.setData("emprunteur_id", String(option.id));
+                createForm.setData("emprunteur_label", option.label);
               }}
             />
 
@@ -567,8 +569,8 @@ export default function EmpruntsList(): React.JSX.Element {
               <Input
                 id="create-date-emprunt"
                 type="date"
-                value={createForm.date_emprunt}
-                onChange={(e) => setCreateForm((prev) => ({ ...prev, date_emprunt: e.target.value }))}
+                value={createForm.data.date_emprunt}
+                onChange={(e) => createForm.setData("date_emprunt", e.target.value)}
                 required
               />
             </div>
@@ -578,8 +580,8 @@ export default function EmpruntsList(): React.JSX.Element {
               <Input
                 id="create-date-retour-prevue"
                 type="date"
-                value={createForm.date_retour_prevue}
-                onChange={(e) => setCreateForm((prev) => ({ ...prev, date_retour_prevue: e.target.value }))}
+                value={createForm.data.date_retour_prevue}
+                onChange={(e) => createForm.setData("date_retour_prevue", e.target.value)}
                 required
               />
             </div>
