@@ -223,10 +223,10 @@ export function DocumentsList({allDocuments, mockRayonnages,allCategories, mockT
         type: "Livre",
       };
       // setDocuments([...documents, newDocument]);
-      post('/Documents'); 
+      post('/Documents');
+      window.location.reload();
       console.log("Nouveau document:", allDocuments);
     }
-    refreshDocumentsData();
     closeCreateModal();
   };
 
