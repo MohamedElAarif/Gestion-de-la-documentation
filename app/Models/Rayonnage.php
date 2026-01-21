@@ -7,8 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Rayonnage extends Model
 {
-    protected $fillable = ['nom'];
     use HasFactory;
+
+    protected $fillable = [
+        'nom',
+        'description',
+        'date_creation',
+    ];
 
     public function categories()
     {

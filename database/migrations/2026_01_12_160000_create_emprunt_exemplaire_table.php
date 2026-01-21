@@ -11,14 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('categories', function (Blueprint $table) {
+        Schema::create('emprunt_exemplaire', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('rayonnage_id')->constrained()->cascadeOnDelete();
-            $table->string('nom');
-            $table->text('description')->nullable();
-            $table->date('date_creation')->nullable();
+            $table->foreignId('emprunt_id')->constrained('emprunts')->cascadeOnDelete();
+            $table->foreignId('exemplaire_id')->constrained('exemplaires')->cascadeOnDelete();
             $table->timestamps();
-            $table->unique(['rayonnage_id', 'nom']);
+            $table->unique(['emprunt_id', 'exemplaire_id']);
         });
     }
 
@@ -27,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('categories');
+        Schema::dropIfExists('emprunt_exemplaire');
     }
 };

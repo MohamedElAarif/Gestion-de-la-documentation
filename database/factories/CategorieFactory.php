@@ -17,10 +17,14 @@ class CategorieFactory extends Factory
      */
     public function definition(): array
     {
+        $rayonnageId = Rayonnage::query()->inRandomOrder()->value('id')
+            ?? Rayonnage::factory()->create()->id;
+
         return [
-            'nom' => fake()->sentence(1),
-            'description' => fake()->paragraph(1),
-            'rayonnage_id' => Rayonnage::inRandomOrder()->first()->id,
+            'nom' => fake()->unique()->words(2, true),
+            'description' => fake()->paragraph(),
+            'date_creation' => fake()->dateTimeBetween('-5 years', 'now'),
+            'rayonnage_id' => $rayonnageId,
         ];
     }
 }

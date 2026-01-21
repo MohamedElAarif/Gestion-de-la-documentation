@@ -14,8 +14,10 @@ return new class extends Migration
         Schema::create('documents', function (Blueprint $table) {
             $table->id();
             $table->string('titre');
-            $table->text( 'description')->nullable();
+            $table->text('description')->nullable();
+            $table->date('date_achat')->nullable();
             $table->boolean('disponible')->default(true);
+            $table->boolean('is_archived')->default(false);
             $table->foreignId('rayonnage_id')
                 ->constrained('rayonnages')
                 ->cascadeOnDelete();

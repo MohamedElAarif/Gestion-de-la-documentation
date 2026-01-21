@@ -7,12 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class Type_Document extends Model
 {
-    protected $fillable = ['nom','description'];
-    protected $table = 'type_documents';
     use HasFactory;
+
+    protected $table = 'type_documents';
+
+    protected $fillable = [
+        'nom',
+        'description',
+        'date_creation',
+    ];
 
     public function documents()
     {
-        return $this->hasMany(Document::class);
+        return $this->hasMany(Document::class,'type_id');
     }
 }

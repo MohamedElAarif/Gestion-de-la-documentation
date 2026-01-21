@@ -17,6 +17,7 @@ return new class extends Migration
             $table->date('date_retour_prevue');
             $table->date('date_retour')->nullable();
             $table->boolean('en_retard')->default(false);
+            $table->boolean('is_archived')->default(false);
             $table->boolean('notifie_retard')->default(false);
             $table->foreignId('document_id')
                 ->constrained()

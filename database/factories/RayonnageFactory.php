@@ -17,7 +17,9 @@ class RayonnageFactory extends Factory
     public function definition(): array
     {
         return [
-            'nom' => fake()->sentence(1),
+            'nom' => fake()->unique()->bothify('RAY-###'),
+            'description' => fake()->paragraph(),
+            'date_creation' => fake()->dateTimeBetween('-10 years', 'now'),
         ];
     }
 }

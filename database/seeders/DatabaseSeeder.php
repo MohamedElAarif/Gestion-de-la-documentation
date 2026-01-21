@@ -24,10 +24,10 @@ class DatabaseSeeder extends Seeder
         }
         $this->call([
             RayonnageSeeder::class,
-            CategorieSeeder::class,
             Type_DocumentSeeder::class,
-            DocumentSeeder::class,
+            CategorieSeeder::class,
             MembreSeeder::class,
+            DocumentSeeder::class,
             EmpruntSeeder::class,
         ]);
     }

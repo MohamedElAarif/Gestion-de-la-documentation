@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Categorie;
 use App\Models\Document;
+use App\Models\Emprunt;
 use App\Models\Rayonnage;
 use App\Models\Type_Document;
 use Illuminate\Http\Request;
@@ -71,10 +72,10 @@ class DocumentController extends Controller
             ->map(fn ($ray) => ['id' => $ray->id, 'nom' => $ray->nom])
             ->toArray();
 
-        $categories = Categorie::select(['id', 'nom'])
+        $categories = Categorie::select(['id', 'nom', 'rayonnage_id'])
             ->orderBy('nom')
             ->get()
-            ->map(fn ($cat) => ['id' => $cat->id, 'nom' => $cat->nom])
+            ->map(fn ($cat) => ['id' => $cat->id, 'nom' => $cat->nom, 'rayonnage_id' => $cat->rayonnage_id])
             ->toArray();
 
         $types = Type_Document::select(['id', 'nom'])
@@ -89,5 +90,46 @@ class DocumentController extends Controller
             'categories' => $categories,
             'types' => $types,
         ]);
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'titre' => 'required|string|max:255',
+            'description' => 'nullable|string|max:2000',
+            'rayonnage_id' => 'required|exists:rayonnages,id',
+            'categorie_id' => 'required|exists:categories,id',
+            'type_id' => 'required|exists:type_documents,id',
+        ]);
+
+        Document::create($validated + ['disponible' => true]);
+
+        return redirect()->route('documents')->with('success', 'Document created successfully!');
+    }
+
+    public function update(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'titre' => 'required|string|max:255',
+            'description' => 'nullable|string|max:2000',
+            'rayonnage_id' => 'required|exists:rayonnages,id',
+            'categorie_id' => 'required|exists:categories,id',
+            'type_id' => 'required|exists:type_documents,id',
+            'disponible' => 'sometimes|boolean',
+        ]);
+
+        $document = Document::findOrFail($id);
+        $document->update($validated);
+
+        return redirect()->route('documents')->with('success', 'Document updated successfully!');
+    }
+
+    public function destroy($id)
+    {
+        $document = Document::findOrFail($id);
+        $document->emprunts()->delete();
+        $document->delete();
+
+        return redirect()->route('documents')->with('success', 'Document deleted successfully!');
     }
 }

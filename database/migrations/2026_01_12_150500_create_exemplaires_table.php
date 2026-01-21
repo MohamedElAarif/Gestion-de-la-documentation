@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('categories', function (Blueprint $table) {
+        Schema::create('exemplaires', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('rayonnage_id')->constrained()->cascadeOnDelete();
-            $table->string('nom');
-            $table->text('description')->nullable();
+            $table->foreignId('document_id')->constrained('documents')->cascadeOnDelete();
+            $table->string('code_exemplaire')->unique();
+            $table->boolean('disponible')->default(true);
+            $table->boolean('is_archived')->default(false);
             $table->date('date_creation')->nullable();
             $table->timestamps();
-            $table->unique(['rayonnage_id', 'nom']);
         });
     }
 
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('categories');
+        Schema::dropIfExists('exemplaires');
     }
 };
