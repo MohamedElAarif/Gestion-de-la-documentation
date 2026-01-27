@@ -23,6 +23,7 @@ class Emprunt extends Model
         'notifie_retard',
         'document_id',
         'emprunteur_id',
+        'batch_code',
     ];
 
     protected $casts = [
@@ -32,6 +33,7 @@ class Emprunt extends Model
         'en_retard' => 'boolean',
         'is_archived' => 'boolean',
         'notifie_retard' => 'boolean',
+        'batch_code' => 'string',
     ];
 
     public function document()

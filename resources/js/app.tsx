@@ -6,9 +6,11 @@ import { createRoot } from 'react-dom/client';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
+const pages = import.meta.glob('./pages/**/*.jsx');
+
 createInertiaApp({
     title: (title) => title ? `${title} - ${appName}` : appName,
-    resolve: (name) => resolvePageComponent(`./pages/${name}.tsx`, import.meta.glob('./pages/**/*.tsx')),
+    resolve: (name) => resolvePageComponent(`./pages/${name}.jsx`, pages),
     setup({ el, App, props }) {
         const root = createRoot(el);
 

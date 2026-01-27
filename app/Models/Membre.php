@@ -7,6 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class Membre extends Model
 {
-    protected $fillable = ['nom','prenom','CIN','email','telephone'];
     use HasFactory;
+
+    protected $fillable = [
+        'nom',
+        'prenom',
+        'CIN',
+        'email',
+        'telephone',
+        'is_active',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
 }
