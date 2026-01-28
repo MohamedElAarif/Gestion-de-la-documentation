@@ -19,13 +19,27 @@ class DocumentFactory extends Factory
      */
     public function definition(): array
     {
+        $categorie = Categorie::query()->inRandomOrder()->with('rayonnage')->first();
+
+        if (!$categorie) {
+            $rayonnage = Rayonnage::factory()->create();
+            $categorie = Categorie::factory()->create([
+                'rayonnage_id' => $rayonnage->id,
+            ]);
+        }
+
+        $type = Type_Document::query()->inRandomOrder()->first()
+            ?? Type_Document::factory()->create();
+
         return [
-            'titre' => fake()->sentence(1),
-            'description' => fake()->paragraph(0.5),
-            'disponible' => fake()->boolean(70),
-            'rayonnage_id' => Rayonnage::inRandomOrder()->first()->id,
-            'categorie_id' => Categorie::inRandomOrder()->first()->id,
-            'type_id' => Type_Document::inRandomOrder()->first()->id,
+            'titre' => fake()->sentence(3),
+            'description' => fake()->paragraph(),
+            'date_achat' => fake()->dateTimeBetween('-10 years', 'now'),
+            'disponible' => true,
+            'is_archived' => fake()->boolean(5),
+            'rayonnage_id' => $categorie->rayonnage_id,
+            'categorie_id' => $categorie->id,
+            'type_id' => $type->id,
         ];
     }
 }

@@ -13,14 +13,12 @@ return new class extends Migration
     {
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('rayonnage_id')->constrained()->cascadeOnDelete();
             $table->string('nom');
             $table->text('description')->nullable();
-            $table->foreignId('rayonnage_id')
-                ->constrained()
-                ->onDelete('cascade');
+            $table->date('date_creation')->nullable();
             $table->timestamps();
             $table->unique(['rayonnage_id', 'nom']);
-
         });
     }
 
