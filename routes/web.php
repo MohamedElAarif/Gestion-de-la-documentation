@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CategorieController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\EmpruntController;
 use App\Http\Controllers\MembreController;
@@ -60,6 +61,25 @@ Route::middleware('auth')->group(function () {
     Route::patch('/Notifications/{notification}/mark-read', [NotificationController::class, 'markRead'])->name('notifications.markRead');
     Route::delete('/Notifications/{notification}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
 });
+
+Route::get('/Rayonnages', [RayonnageController::class, 'index'])->name('rayonnages');
+Route::get('/Rayonnages/data', [RayonnageController::class, 'indexData'])->name('rayonnages.indexData');
+Route::post('/Rayonnages', [RayonnageController::class, 'store'])->name('rayonnages.store');
+Route::put('/Rayonnages/{id}', [RayonnageController::class, 'update'])->name('rayonnages.update');
+Route::delete('/Rayonnages/{id}', [RayonnageController::class, 'destroy'])->name('rayonnages.destroy');
+
+Route::get('/Categories', [CategorieController::class, 'index'])->name('categories');
+Route::get('/Categories/data', [CategorieController::class, 'indexData'])->name('categories.indexData');
+Route::post('/Categories', [CategorieController::class, 'store'])->name('categories.store');
+Route::put('/Categories/{id}', [CategorieController::class, 'update'])->name('categories.update');
+Route::delete('/Categories/{id}', [CategorieController::class, 'destroy'])->name('categories.destroy');
+
+
+Route::get('/Type Documents', [Type_DocumentController::class, 'index'])->name('type_documents');
+Route::get('/Type Documents/data', [Type_DocumentController::class, 'indexData'])->name('type_documents.indexData');
+Route::post('/Type Documents', [Type_DocumentController::class, 'store'])->name('type_documents.store');
+Route::put('/Type Documents/{id}', [Type_DocumentController::class, 'update'])->name('type_documents.update');
+Route::delete('/Type Documents/{id}', [Type_DocumentController::class, 'destroy'])->name('type_documents.destroy');
 
 
 
