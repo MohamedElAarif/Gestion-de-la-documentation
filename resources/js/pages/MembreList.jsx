@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { usePage } from "@inertiajs/react";
-import Layout from "../Layouts/Layout";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
@@ -150,8 +149,7 @@ export default function MembreList() {
             ].some((value) => value?.toLowerCase().includes(q));
         });
     }, [membres, searchQuery]);
-    return (<Layout>
-      <div className="p-6 space-y-6">
+    return (<div className="p-6 space-y-6">
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
@@ -258,6 +256,5 @@ export default function MembreList() {
             </form>
           </DialogContent>
         </Dialog>
-      </div>
-    </Layout>);
+      </div>);
 }

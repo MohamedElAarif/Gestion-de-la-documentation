@@ -1,6 +1,5 @@
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { router, useForm } from "@inertiajs/react";
-import Layout from "../Layouts/Layout";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
@@ -457,21 +456,21 @@ export default function DocumentsList({ allDocuments, rayonnages, categories, ty
 
           <Input placeholder="Recherche avancée (rayonnage, catégorie, type...)" value={structureQuery} onChange={(e) => setStructureQuery(e.target.value)} className="w-full"/>
 
-          <div className="rounded-md border">
-            <Table>
+          <div className="rounded-md border overflow-x-auto">
+            <Table className="text-sm">
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-10"></TableHead>
-                  <TableHead>ID</TableHead>
+                  <TableHead className="w-10 py-2"></TableHead>
+                  <TableHead className="w-16 py-2">ID</TableHead>
                   <TableHead>
                     <Button variant="ghost" size="sm" onClick={() => handleSort("titre")} className="gap-1">
                       Titre <ArrowUpDown className="w-3 h-3"/>
                     </Button>
                   </TableHead>
-                  <TableHead>Description</TableHead>
-                  <TableHead>Rayonnage</TableHead>
-                  <TableHead>Catégorie</TableHead>
-                  <TableHead>Type</TableHead>
+                  <TableHead className="py-2">Description</TableHead>
+                  <TableHead className="py-2">Rayonnage</TableHead>
+                  <TableHead className="py-2">Catégorie</TableHead>
+                  <TableHead className="py-2">Type</TableHead>
                   <TableHead>
                     <Button variant="ghost" size="sm" onClick={() => handleSort("dateAchat")} className="gap-1">
                       Date d'achat <ArrowUpDown className="w-3 h-3"/>
@@ -482,8 +481,8 @@ export default function DocumentsList({ allDocuments, rayonnages, categories, ty
                       Date création <ArrowUpDown className="w-3 h-3"/>
                     </Button>
                   </TableHead>
-                  <TableHead>Disponibilité</TableHead>
-                  <TableHead>Actions</TableHead>
+                  <TableHead className="py-2 w-28">Disponibilité</TableHead>
+                  <TableHead className="py-2 w-[260px]">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -504,33 +503,35 @@ export default function DocumentsList({ allDocuments, rayonnages, categories, ty
             const detailWrapperClasses = `overflow-hidden transition-all duration-300 ease-in-out ${expanded ? "max-h-[800px] opacity-100 py-4" : "max-h-0 opacity-0"}`;
             const toggleClasses = `p-1 rounded transition-all duration-200 ${expanded ? "bg-muted" : ""} ${hasExemplaires ? "hover:bg-muted focus-visible:ring" : "opacity-30 cursor-not-allowed"}`;
             return (<Fragment key={doc.id}>
-                      <TableRow>
-                        <TableCell>
+                      <TableRow className="align-top">
+                        <TableCell className="py-2">
                           {hasExemplaires ? (<button type="button" onClick={() => toggleRow(doc.id)} className={toggleClasses} aria-label="Afficher les exemplaires" aria-expanded={expanded}>
                               {expanded ? (<ChevronDown className="w-4 h-4"/>) : (<ChevronRight className="w-4 h-4"/>)}
                             </button>) : null}
                         </TableCell>
-                        <TableCell>{doc.id}</TableCell>
-                        <TableCell className="font-medium">
-                          <div className="flex items-center gap-2">
-                            {doc.titre}
+                        <TableCell className="py-2 whitespace-nowrap">{doc.id}</TableCell>
+                        <TableCell className="py-2 font-medium">
+                          <div className="flex items-center gap-2 max-w-[260px]">
+                            <span className="truncate" title={doc.titre}>{doc.titre}</span>
                             {doc.is_archived && <Badge variant="outline">Archivé</Badge>}
                           </div>
                         </TableCell>
-                        <TableCell>{doc.description ?? "—"}</TableCell>
-                        <TableCell>{doc.rayonnage ?? "—"}</TableCell>
-                        <TableCell>{doc.categorie ?? "—"}</TableCell>
-                        <TableCell>{doc.type ?? "—"}</TableCell>
-                        <TableCell>{doc.dateAchat ?? "—"}</TableCell>
-                        <TableCell>{doc.dateCreation ?? "—"}</TableCell>
-                        <TableCell>
+                        <TableCell className="py-2 max-w-[320px]">
+                          <span className="line-clamp-2" title={doc.description ?? ""}>{doc.description ?? "—"}</span>
+                        </TableCell>
+                        <TableCell className="py-2 whitespace-nowrap">{doc.rayonnage ?? "—"}</TableCell>
+                        <TableCell className="py-2 whitespace-nowrap">{doc.categorie ?? "—"}</TableCell>
+                        <TableCell className="py-2 whitespace-nowrap">{doc.type ?? "—"}</TableCell>
+                        <TableCell className="py-2 whitespace-nowrap">{doc.dateAchat ?? "—"}</TableCell>
+                        <TableCell className="py-2 whitespace-nowrap">{doc.dateCreation ?? "—"}</TableCell>
+                        <TableCell className="py-2">
                           <Badge variant={availableCount > 0 ? "default" : "destructive"}>
                             {archivedFilter === "active"
                     ? `${availableCount} / ${nonArchivedCount}`
                     : availableCount}
                           </Badge>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="py-2">
                           <div className="flex flex-wrap gap-2">
                             {!hasExemplaires && (<Button size="sm" className="gap-1" style={{ backgroundColor: "#147a40" }} onClick={() => openAddExemplairesModal(doc)}>
                                 <Plus className="w-3 h-3"/>
@@ -759,6 +760,5 @@ export default function DocumentsList({ allDocuments, rayonnages, categories, ty
           </form>
         </DialogContent>
       </Dialog>
-    </div>);
+  </div>);
 }
-DocumentsList.layout = (page) => <Layout>{page}</Layout>;

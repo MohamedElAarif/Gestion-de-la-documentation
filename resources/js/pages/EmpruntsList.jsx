@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useForm, usePage } from "@inertiajs/react";
-import Layout from "../Layouts/Layout";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
@@ -696,7 +695,7 @@ export default function EmpruntsList() {
         w.document.close();
         w.print();
     };
-    return (<Layout>
+    return (<div>
       <div className="p-6 space-y-6">
         <Card>
           <CardHeader>
@@ -1043,5 +1042,5 @@ export default function EmpruntsList() {
           </form>
         </DialogContent>
       </Dialog>
-    </Layout>);
+    </div>);
 }

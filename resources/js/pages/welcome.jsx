@@ -209,6 +209,4 @@ function Welcome() {
             </div>
         </>);
 }
-// Assign the layout function to the Welcome component
-Welcome.layout = (page) => <Layout children={page}/>;
 export default Welcome;

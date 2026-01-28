@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { usePage } from "@inertiajs/react";
-import Layout from "../Layouts/Layout";
 import { Input } from "../ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
@@ -163,7 +162,6 @@ export default function NotificationList() {
     const unreadCount = useMemo(() => notifications.filter((notif) => !notif.est_lu).length, [notifications]);
 
     return (
-        <Layout>
             <div className="p-6 space-y-6">
                 <Card>
                     <CardHeader>
@@ -302,6 +300,5 @@ export default function NotificationList() {
                     </CardContent>
                 </Card>
             </div>
-        </Layout>
     );
 }

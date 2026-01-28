@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { Input } from "./ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
-import { Badge } from "./ui/badge";
-import { Button } from "./ui/button";
+import { Input } from "../ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
+import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
 import { Search, Trash2, Check } from "lucide-react";
 
 const initialMockNotifications = [
