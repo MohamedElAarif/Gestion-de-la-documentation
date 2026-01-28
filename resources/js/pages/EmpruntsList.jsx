@@ -11,36 +11,7 @@ import { Label } from "../ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Plus, Search, Pencil, Trash2, ArrowUpDown, CheckCircle, Printer } from "lucide-react";
 
-type EmpruntItem = {
-  id: number;
-  document_id?: number | null;
-  emprunteur_id?: number | null;
-  document?: string | null;
-  emprunteur?: string | null;
-  date_emprunt?: string | null;
-  date_retour_prevue?: string | null;
-  date_retour_reelle?: string | null;
-  status?: string | null;
-  en_retard?: boolean;
-  retard_notifie?: boolean;
-};
-
-type OptionItem = {
-  id: number;
-  label: string;
-};
-
-type ComboInputProps = {
-  label: string;
-  placeholder: string;
-  options: OptionItem[];
-  textValue: string;
-  selectedId: string;
-  onTextChange: (value: string) => void;
-  onSelectOption: (option: OptionItem) => void;
-};
-
-const ComboInput: React.FC<ComboInputProps> = ({
+const ComboInput = ({
   label,
   placeholder,
   options,
@@ -106,17 +77,17 @@ const ComboInput: React.FC<ComboInputProps> = ({
   );
 };
 
-function getCsrfToken(): string {
-  const el = document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement | null;
+function getCsrfToken() {
+  const el = document.querySelector('meta[name="csrf-token"]');
   return el?.content ?? "";
 }
 
-async function fetchJson<T = any>(url: string, method = "GET", body?: any): Promise<T> {
-  const headers: Record<string, string> = { 
+async function fetchJson(url, method = "GET", body)  {
+  const headers = { 
     Accept: "application/json",
     "X-Requested-With": "XMLHttpRequest" 
   };
-  const opts: RequestInit = { method, credentials: "same-origin", headers };
+  const opts = { method, credentials: "same-origin", headers };
   if (method !== "GET") {
     headers["Content-Type"] = "application/json";
     headers["X-CSRF-TOKEN"] = getCsrfToken();
@@ -127,21 +98,21 @@ async function fetchJson<T = any>(url: string, method = "GET", body?: any): Prom
     const txt = await res.text();
     throw new Error(`Request failed ${res.status}: ${txt}`);
   }
-  return (await res.json()) as T;
+  return (await res.json());
 }
 
-export default function EmpruntsList(): React.JSX.Element {
-  const { props } = usePage<{ allEmprunts?: EmpruntItem[]; documents?: OptionItem[]; membres?: OptionItem[] }>();
+export default function EmpruntsList() {
+  const { props } = usePage();
   const serverEmprunts = Array.isArray(props.allEmprunts) ? props.allEmprunts : null;
   const initialDocumentOptions = useMemo(() => (Array.isArray(props.documents) ? props.documents : []), [props.documents]);
   const initialMembreOptions = useMemo(() => (Array.isArray(props.membres) ? props.membres : []), [props.membres]);
-  const [documentOptions, setDocumentOptions] = useState<OptionItem[]>(initialDocumentOptions);
-  const [membreOptions, setMembreOptions] = useState<OptionItem[]>(initialMembreOptions);
-  const [emprunts, setEmprunts] = useState<EmpruntItem[]>(serverEmprunts ?? []);
-  const [loading, setLoading] = useState<boolean>(!serverEmprunts);
-  const [isCreateOpen, setIsCreateOpen] = useState<boolean>(false);
-  const [isEditOpen, setIsEditOpen] = useState<boolean>(false);
-  const [editingTarget, setEditingTarget] = useState<EmpruntItem | null>(null);
+  const [documentOptions, setDocumentOptions] = useState(initialDocumentOptions);
+  const [membreOptions, setMembreOptions] = useState(initialMembreOptions);
+  const [emprunts, setEmprunts] = useState(serverEmprunts ?? []);
+  const [loading, setLoading] = useState(!serverEmprunts);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [editingTarget, setEditingTarget] = useState(null);
   const [editForm, setEditForm] = useState({
     date_emprunt: "",
     date_retour_prevue: "",
@@ -162,20 +133,20 @@ export default function EmpruntsList(): React.JSX.Element {
     emprunteur_text: "",
   });
 
-  const handleDocumentTextChange = (value: string) => {
+  const handleDocumentTextChange = (value) => {
     setCreateFormText((prev) => ({ ...prev, document_text: value }));
     setCreateForm((prev) => ({ ...prev, document_id: "" }));
   };
 
-  const handleEmprunteurTextChange = (value: string) => {
+  const handleEmprunteurTextChange = (value) => {
     setCreateFormText((prev) => ({ ...prev, emprunteur_text: value }));
     setCreateForm((prev) => ({ ...prev, emprunteur_id: "" }));
   };
 
-  const [searchQuery, setSearchQuery] = useState<string>("");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [retardFilter, setRetardFilter] = useState<string>("all");
-  const [sortBy, setSortBy] = useState<string>("date_emprunt");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [retardFilter, setRetardFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("date_emprunt");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
 
   useEffect(() => {
@@ -188,7 +159,7 @@ export default function EmpruntsList(): React.JSX.Element {
 
   const fetchOptions = useCallback(async () => {
     try {
-      const data = await fetchJson<{ documents?: OptionItem[]; membres?: OptionItem[] }>("/Emprunts/options");
+      const data = await fetchJson("/Emprunts/options");
       if (Array.isArray(data.documents)) setDocumentOptions(data.documents);
       if (Array.isArray(data.membres)) setMembreOptions(data.membres);
     } catch (error) {
@@ -203,7 +174,7 @@ export default function EmpruntsList(): React.JSX.Element {
     (async () => {
       setLoading(true);
       try {
-        const data = await fetchJson<EmpruntItem[]>("/Emprunts/data");
+        const data = await fetchJson("/Emprunts/data");
         const normalized = data.map((e) => ({
           id: Number(e.id),
           document_id: e.document_id ?? null,
@@ -231,7 +202,7 @@ export default function EmpruntsList(): React.JSX.Element {
   const reload = async () => {
     setLoading(true);
     try {
-      const data = await fetchJson<EmpruntItem[]>("/Emprunts/data");
+      const data = await fetchJson("/Emprunts/data");
       const normalized = data.map((e) => ({
         id: Number(e.id),
         document_id: e.document_id ?? null,
@@ -253,23 +224,23 @@ export default function EmpruntsList(): React.JSX.Element {
     }
   };
 
-  const createEmprunt = async (payload: Partial<EmpruntItem>) => {
+  const createEmprunt = async (payload) => {
     await fetchJson("/Emprunts", "POST", payload);
     await reload();
   };
 
-  const updateEmprunt = async (id: number, payload: Partial<EmpruntItem>) => {
+  const updateEmprunt = async (id, payload) => {
     await fetchJson(`/Emprunts/${id}`, "PUT", payload);
     await reload();
   };
 
-  const deleteEmprunt = async (id: number) => {
+  const deleteEmprunt = async (id) => {
     if (!confirm("Supprimer cet emprunt ?")) return;
     await fetchJson(`/Emprunts/${id}`, "DELETE");
     await reload();
   };
 
-  const markReturned = async (id: number) => {
+  const markReturned = async (id) => {
     await fetchJson(`/Emprunts/${id}/return`, "PUT", {});
     await reload();
   };
@@ -289,7 +260,7 @@ export default function EmpruntsList(): React.JSX.Element {
     setIsCreateOpen(false);
   };
 
-  const openEditModal = (item: EmpruntItem) => {
+  const openEditModal = (item) => {
     setEditingTarget(item);
     setEditForm({
       date_emprunt: item.date_emprunt ?? "",
@@ -306,7 +277,7 @@ export default function EmpruntsList(): React.JSX.Element {
     setEditingTarget(null);
   };
 
-  const handleEditSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleEditSubmit = async (event) => {
     event.preventDefault();
     if (!editingTarget) return;
     await updateEmprunt(editingTarget.id, {
@@ -319,7 +290,7 @@ export default function EmpruntsList(): React.JSX.Element {
     closeEditModal();
   };
 
-  const handleCreateSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleCreateSubmit = async (event) => {
     event.preventDefault();
     let documentId = createForm.document_id;
     let emprunteurId = createForm.emprunteur_id;
@@ -365,7 +336,7 @@ export default function EmpruntsList(): React.JSX.Element {
       }
     }
 
-    const payload: any = {
+    const payload = {
       date_emprunt: createForm.date_emprunt,
       date_retour_prevue: createForm.date_retour_prevue,
     };
@@ -402,8 +373,8 @@ export default function EmpruntsList(): React.JSX.Element {
         return true;
       })
       .sort((a, b) => {
-        const aVal: any = (a as any)[sortBy] ?? "";
-        const bVal: any = (b as any)[sortBy] ?? "";
+        const aVal = (a)[sortBy] ?? "";
+        const bVal = (b)[sortBy] ?? "";
         if (sortBy.includes("date")) {
           const at = Number(new Date(aVal || "").getTime()) || 0;
           const bt = Number(new Date(bVal || "").getTime()) || 0;
@@ -416,12 +387,12 @@ export default function EmpruntsList(): React.JSX.Element {
       });
   }, [emprunts, searchQuery, statusFilter, retardFilter, sortBy, sortOrder]);
 
-  const toggleSort = (field: string) => {
+  const toggleSort = (field) => {
     if (sortBy === field) setSortOrder((s) => (s === "asc" ? "desc" : "asc"));
     else { setSortBy(field); setSortOrder("asc"); }
   };
 
-  const handlePrint = (emprunt: EmpruntItem) => {
+  const handlePrint = (emprunt) => {
     const w = window.open("", "_blank");
     if (!w) return;
     w.document.write(`<html><head><title>Ticket ${emprunt.id}</title></head><body>

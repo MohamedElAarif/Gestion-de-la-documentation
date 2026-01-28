@@ -1,10 +1,6 @@
 import Layout from '../Layouts/Layout';
 import { Head } from '@inertiajs/react';
-import type { ReactNode } from 'react';
 
-interface LayoutProps {
-  children: ReactNode;
-}
 
 function Welcome() {
     return (
@@ -766,7 +762,7 @@ function Welcome() {
 }
 
 // Assign the layout function to the Welcome component
-Welcome.layout = (page: ReactNode) => <Layout children={page} />;
+Welcome.layout = (page) => <Layout children={page} />;
 
 export default Welcome;
 

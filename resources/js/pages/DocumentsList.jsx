@@ -1,6 +1,5 @@
 import Layout from '../Layouts/Layout';
 import { useState, useMemo, useEffect } from "react";
-import type { ReactNode } from 'react';
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
@@ -12,72 +11,7 @@ import { Plus, Search, Pencil, Trash2, ArrowUpDown } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import {router, useForm } from '@inertiajs/react';
 
-interface LayoutProps {
-  children: ReactNode;
-}
-
-interface Document {
-  id: number;
-  titre: string;
-  description: string;
-  disponible: boolean;
-  dateCreation: string;
-  dateModification: string;
-  rayonnage_id: number;
-  rayonnage: string;
-  categorie_id: number;
-  categorie: object;
-  type_id: number;
-  type: string;
-}
-
-interface DocumentsListProps {
-  allDocuments: Document[];
-}
-
-// const initialMockDocuments = [
-//   {
-//     id: 1,
-//     titre: "Introduction à l'informatique",
-//     description: "Un guide complet pour débutants",
-//     disponible: true,
-//     dateCreation: "2025-06-15",
-//     dateModification: "2025-12-20",
-//     rayonnage_id: 5,
-//     rayonnage: "Section E - Technologie",
-//     categorie_id: 5,
-//     categorie: "Technologie",
-//     type_id: 1,
-//     type: "Livre",
-//   }
-// ];
-
-// Mock data for filters
-// const mockRayonnages = [
-//   { id: 1, nom: "Section A - Sciences" },
-//   { id: 2, nom: "Section B - Histoire" },
-//   { id: 3, nom: "Section C - Littérature" },
-//   { id: 4, nom: "Section D - Arts" },
-//   { id: 5, nom: "Section E - Technologie" },
-// ];
-
-// const mockCategories = [
-//   { id: 1, nom: "Sciences" },
-//   { id: 2, nom: "Histoire" },
-//   { id: 3, nom: "Littérature" },
-//   { id: 4, nom: "Arts" },
-//   { id: 5, nom: "Technologie" },
-// ];
-
-// const mockTypes = [
-//   { id: 1, nom: "Livre" },
-//   { id: 2, nom: "Magazine" },
-//   { id: 3, nom: "Thèse" },
-//   { id: 4, nom: "DVD" },
-//   { id: 5, nom: "E-book" },
-// ];
-
-const ComboInput: React.FC<ComboInputProps> = ({
+const ComboInput = ({
   label,
   placeholder,
   options,
@@ -143,7 +77,7 @@ const ComboInput: React.FC<ComboInputProps> = ({
   );
 };
 
-export function DocumentsList({allDocuments, mockRayonnages,allCategories, mockTypes}:DocumentsListProps) {
+function DocumentsList({allDocuments, mockRayonnages,allCategories, mockTypes}) {
   const [documents, setDocuments] = useState(allDocuments);
   const [mockCategories, setMockCategories] = useState(allCategories);
   const [searchQuery, setSearchQuery] = useState("");
@@ -154,7 +88,7 @@ export function DocumentsList({allDocuments, mockRayonnages,allCategories, mockT
   const [sortBy, setSortBy] = useState("titre");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [open, setOpen] = useState(false);
-  const [editingDocument, setEditingDocument] = useState<any>(null);
+  const [editingDocument, setEditingDocument] = useState(null);
   const {data,  setData, post, processing} = useForm({
     titre: "",
     description: "",
@@ -171,7 +105,7 @@ export function DocumentsList({allDocuments, mockRayonnages,allCategories, mockT
     setOpen(false);
   };
 
-  const openEditModal = (document: Document) => {
+  const openEditModal = (document) => {
     setEditingDocument(document);
     setData({
       titre: document.titre,
@@ -185,7 +119,7 @@ export function DocumentsList({allDocuments, mockRayonnages,allCategories, mockT
     setEditingDocument(null);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (data.titre.trim() === "" || data.description.trim() === "") {
       alert("Veuillez remplir tous les champs avant de soumettre.");
@@ -222,7 +156,6 @@ export function DocumentsList({allDocuments, mockRayonnages,allCategories, mockT
         type_id: 1,
         type: "Livre",
       };
-      // setDocuments([...documents, newDocument]);
       post('/Documents');
       window.location.reload();
       console.log("Nouveau document:", allDocuments);
@@ -230,7 +163,7 @@ export function DocumentsList({allDocuments, mockRayonnages,allCategories, mockT
     closeCreateModal();
   };
 
-  const handleEdit = (document: any) => {
+  const handleEdit = (document) => {
     setEditingDocument(document);
     setData({
       titre: document.titre,
@@ -239,14 +172,14 @@ export function DocumentsList({allDocuments, mockRayonnages,allCategories, mockT
     setOpen(true);
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (id) => {
     if (confirm("Êtes-vous sûr de vouloir supprimer ce document ?")) {
       setDocuments(documents.filter(d => d.id !== id));
       console.log("Document supprimé:", id);
     }
   };
 
-  const toggleSort = (field: string) => {
+  const toggleSort = (field) => {
     if (sortBy === field) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
@@ -291,8 +224,8 @@ export function DocumentsList({allDocuments, mockRayonnages,allCategories, mockT
 
   // Sort documents
   filteredDocuments.sort((a, b) => {
-    let aVal: any = a[sortBy as keyof typeof a];
-    let bVal: any = b[sortBy as keyof typeof b];
+    let aVal = a;
+    let bVal = b;
     
     if (typeof aVal === "string") {
       aVal = aVal.toLowerCase();
@@ -525,7 +458,7 @@ console.log(rayonnageFilter)
 
 
 // Assign the layout function to the Welcome component
-DocumentsList.layout = (page: ReactNode) => <Layout children={page} />;
+DocumentsList.layout = (page) => <Layout children={page} />;
 
 export default DocumentsList;
 
