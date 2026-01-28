@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { Link } from "@inertiajs/react";
 
-type TabType = "emprunts" | "documents" | "rayonnage" | "categorie" | "typeDocument" | "membre" | "notification";
+type TabType = "emprunts" | "documents" | "rayonnages" | "categories" | "typeDocuments" | "membres" | "notifications";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -22,11 +22,11 @@ export default function Layout({ children }: LayoutProps){
     const navItems = [
         { id: "emprunts" as TabType, label: "Emprunts", icon: BookOpen },
         { id: "documents" as TabType, label: "Documents", icon: FileText },
-        { id: "rayonnage" as TabType, label: "Rayonnage", icon: Grid3x3 },
-        { id: "categorie" as TabType, label: "Categorie", icon: FolderOpen },
-        { id: "typeDocument" as TabType, label: "Type Document", icon: FileType },
-        { id: "membre" as TabType, label: "Membre", icon: Users },
-        { id: "notification" as TabType, label: "Notification", icon: Bell },
+        { id: "rayonnages" as TabType, label: "Rayonnages", icon: Grid3x3 },
+        { id: "categories" as TabType, label: "Categories", icon: FolderOpen },
+        { id: "typeDocuments" as TabType, label: "Type Documents", icon: FileType },
+        { id: "membres" as TabType, label: "Membres", icon: Users },
+        { id: "notifications" as TabType, label: "Notifications", icon: Bell },
     ];
     return (
         <div className="min-h-screen bg-gray-50">

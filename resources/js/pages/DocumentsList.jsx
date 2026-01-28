@@ -1,6 +1,5 @@
 import Layout from '../Layouts/Layout';
-import { useState } from "react";
-import type { ReactNode } from 'react';
+import { useState, useMemo, useEffect } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
@@ -10,131 +9,77 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Label } from "../ui/label";
 import { Plus, Search, Pencil, Trash2, ArrowUpDown } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import {router, useForm } from '@inertiajs/react';
 
-interface LayoutProps {
-  children: ReactNode;
-}
+const ComboInput = ({
+  label,
+  placeholder,
+  options,
+  textValue,
+  selectedId,
+  onTextChange,
+  onSelectOption,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const normalizedQuery = textValue.trim().toLowerCase();
+  const suggestions = useMemo(() => {
+    const base = normalizedQuery ? options.filter((opt) => opt.label.toLowerCase().includes(normalizedQuery)) : options;
+    return base.slice(0, 8);
+  }, [options, normalizedQuery]);
+  
+  return (
+    <div className="space-y-2">
+      <Label>{label}</Label>
+      <div className="relative">
+        <Input
+          placeholder={placeholder}
+          value={textValue}
+          onChange={(e) => {
+            onTextChange(e.target.value);
+            setIsOpen(true);
+          }}
+          onFocus={() => setIsOpen(true)}
+          onBlur={() => {
+            window.setTimeout(() => setIsOpen(false), 120);
+          }}
+        />
+        {selectedId && (
+          <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500">
+            #{selectedId}
+          </span>
+        )}
+        {isOpen && (
+          <div className="absolute z-20 mt-1 max-h-56 w-full overflow-y-auto rounded-md border bg-white shadow">
+            {suggestions.length === 0 ? (
+              <div className="px-3 py-2 text-sm text-gray-500">Aucun résultat</div>
+            ) : (
+              suggestions.map((option) => (
+                <button
+                  type="button"
+                  key={option.id}
+                  className="flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-gray-100"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => {
+                    onTextChange(option.label);
+                    onSelectOption(option);
+                    setIsOpen(false);
+                  }}
+                >
+                  <span>{option.label}</span>
+                  <span className="text-xs text-gray-500">#{option.id}</span>
+                </button>
+              ))
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
-interface Document {
-  id: number;
-  titre: string;
-  description: string;
-  disponible: boolean;
-  dateCreation: string;
-  dateModification: string;
-  rayonnage_id: number;
-  rayonnage: string;
-  categorie_id: number;
-  categorie: string;
-  type_id: number;
-  type: string;
-}
-
-interface DocumentsListProps {
-  allDocuments: Document[];
-}
-
-const initialMockDocuments = [
-  {
-    id: 1,
-    titre: "Introduction à l'informatique",
-    description: "Un guide complet pour débutants",
-    disponible: true,
-    dateCreation: "2025-06-15",
-    dateModification: "2025-12-20",
-    rayonnage_id: 5,
-    rayonnage: "Section E - Technologie",
-    categorie_id: 5,
-    categorie: "Technologie",
-    type_id: 1,
-    type: "Livre",
-  },
-  {
-    id: 2,
-    titre: "Histoire du Maroc",
-    description: "L'histoire complète du royaume",
-    disponible: true,
-    dateCreation: "2025-07-10",
-    dateModification: "2025-11-05",
-    rayonnage_id: 2,
-    rayonnage: "Section B - Histoire",
-    categorie_id: 2,
-    categorie: "Histoire",
-    type_id: 1,
-    type: "Livre",
-  },
-  {
-    id: 3,
-    titre: "Mathématiques avancées",
-    description: "Algèbre et analyse",
-    disponible: false,
-    dateCreation: "2025-08-20",
-    dateModification: "2025-12-30",
-    rayonnage_id: 1,
-    rayonnage: "Section A - Sciences",
-    categorie_id: 1,
-    categorie: "Sciences",
-    type_id: 1,
-    type: "Livre",
-  },
-  {
-    id: 4,
-    titre: "Physique quantique",
-    description: "Introduction à la physique moderne",
-    disponible: true,
-    dateCreation: "2025-09-05",
-    dateModification: "2026-01-02",
-    rayonnage_id: 1,
-    rayonnage: "Section A - Sciences",
-    categorie_id: 1,
-    categorie: "Sciences",
-    type_id: 3,
-    type: "Thèse",
-  },
-  {
-    id: 5,
-    titre: "Littérature française",
-    description: "Grands classiques de la littérature",
-    disponible: true,
-    dateCreation: "2025-05-12",
-    dateModification: "2025-10-18",
-    rayonnage_id: 3,
-    rayonnage: "Section C - Littérature",
-    categorie_id: 3,
-    categorie: "Littérature",
-    type_id: 5,
-    type: "E-book",
-  },
-];
-
-// Mock data for filters
-const mockRayonnages = [
-  { id: 1, nom: "Section A - Sciences" },
-  { id: 2, nom: "Section B - Histoire" },
-  { id: 3, nom: "Section C - Littérature" },
-  { id: 4, nom: "Section D - Arts" },
-  { id: 5, nom: "Section E - Technologie" },
-];
-
-const mockCategories = [
-  { id: 1, nom: "Sciences" },
-  { id: 2, nom: "Histoire" },
-  { id: 3, nom: "Littérature" },
-  { id: 4, nom: "Arts" },
-  { id: 5, nom: "Technologie" },
-];
-
-const mockTypes = [
-  { id: 1, nom: "Livre" },
-  { id: 2, nom: "Magazine" },
-  { id: 3, nom: "Thèse" },
-  { id: 4, nom: "DVD" },
-  { id: 5, nom: "E-book" },
-];
-
-export function DocumentsList({allDocuments}:DocumentsListProps) {
-  console.log(allDocuments)
+function DocumentsList({allDocuments, mockRayonnages,allCategories, mockTypes}) {
   const [documents, setDocuments] = useState(allDocuments);
+  const [mockCategories, setMockCategories] = useState(allCategories);
   const [searchQuery, setSearchQuery] = useState("");
   const [availabilityFilter, setAvailabilityFilter] = useState("all");
   const [rayonnageFilter, setRayonnageFilter] = useState("all");
@@ -143,36 +88,64 @@ export function DocumentsList({allDocuments}:DocumentsListProps) {
   const [sortBy, setSortBy] = useState("titre");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [open, setOpen] = useState(false);
-  const [editingDocument, setEditingDocument] = useState<any>(null);
-  const [formData, setFormData] = useState({
+  const [editingDocument, setEditingDocument] = useState(null);
+  const {data,  setData, post, processing} = useForm({
     titre: "",
     description: "",
   });
+  console.log('cat');
+  console.log(mockCategories);
+  const openCreateModal = () => {
+    setData({ titre: "", description: "" });
+    setEditingDocument(null);
+    setOpen(true);
+  };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const closeCreateModal = () => {
+    setOpen(false);
+  };
+
+  const openEditModal = (document) => {
+    setEditingDocument(document);
+    setData({
+      titre: document.titre,
+      description: document.description,
+    });
+    setOpen(true);
+  };
+
+  const closeEditModal = () => {
+    setOpen(false);
+    setEditingDocument(null);
+  };
+
+  const handleSubmit = (e) => {
     e.preventDefault();
+    if (data.titre.trim() === "" || data.description.trim() === "") {
+      alert("Veuillez remplir tous les champs avant de soumettre.");
+      return;
+    }
+
     if (editingDocument) {
-      // Update existing document
-      const updatedDocuments = documents.map(doc => 
-        doc.id === editingDocument.id 
-          ? { 
-              ...doc, 
-              titre: formData.titre,
-              description: formData.description,
-              dateModification: new Date().toISOString().split('T')[0]
+      const updatedDocuments = documents.map((doc) =>
+        doc.id === editingDocument.id
+          ? {
+              ...doc,
+              titre: data.titre,
+              description: data.description,
+              dateModification: new Date().toISOString().split("T")[0],
             }
           : doc
       );
       setDocuments(updatedDocuments);
-      console.log("Document modifié:", formData);
+      console.log("Document modifié:", data);
     } else {
-      // Add new document
-      const newId = Math.max(...documents.map(d => d.id)) + 1;
-      const today = new Date().toISOString().split('T')[0];
+      const newId = documents.length > 0 ? Math.max(...documents.map((d) => d.id)) + 1 : 1;
+      const today = new Date().toISOString().split("T")[0];
       const newDocument = {
         id: newId,
-        titre: formData.titre,
-        description: formData.description,
+        titre: data.titre,
+        description: data.description,
         disponible: true,
         dateCreation: today,
         dateModification: today,
@@ -183,31 +156,30 @@ export function DocumentsList({allDocuments}:DocumentsListProps) {
         type_id: 1,
         type: "Livre",
       };
-      setDocuments([...documents, newDocument]);
-      console.log("Nouveau document:", newDocument);
+      post('/Documents');
+      window.location.reload();
+      console.log("Nouveau document:", allDocuments);
     }
-    setOpen(false);
-    setEditingDocument(null);
-    setFormData({ titre: "", description: "" });
+    closeCreateModal();
   };
 
-  const handleEdit = (document: any) => {
+  const handleEdit = (document) => {
     setEditingDocument(document);
-    setFormData({
+    setData({
       titre: document.titre,
       description: document.description,
     });
     setOpen(true);
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (id) => {
     if (confirm("Êtes-vous sûr de vouloir supprimer ce document ?")) {
       setDocuments(documents.filter(d => d.id !== id));
       console.log("Document supprimé:", id);
     }
   };
 
-  const toggleSort = (field: string) => {
+  const toggleSort = (field) => {
     if (sortBy === field) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
@@ -216,6 +188,27 @@ export function DocumentsList({allDocuments}:DocumentsListProps) {
     }
   };
 
+  const refreshDocumentsData = () => {
+    router.reload({ only: ['allDocuments'] });
+  };
+
+  useEffect(()=>{
+    if (rayonnageFilter === 'all') {
+      setCategorieFilter('all');
+      return setMockCategories(allCategories);
+    }else {
+      setCategorieFilter('all');
+      return setMockCategories(allCategories.filter(cat => cat.rayonnage_id == rayonnageFilter));
+    }
+  },[rayonnageFilter,data.rayonnage,data.categories]);
+
+  useEffect(() => {
+    if (data.rayonnage_id === undefined || data.rayonnage_id === null) {
+      setMockCategories(allCategories);
+    } else {
+      setMockCategories(allCategories.filter((cat) => cat.rayonnage_id === data.rayonnage_id));
+    }
+  }, [data.rayonnage_id, allCategories]);
   // Filter and sort documents
   let filteredDocuments = documents.filter(
     (doc) =>
@@ -224,15 +217,15 @@ export function DocumentsList({allDocuments}:DocumentsListProps) {
       (availabilityFilter === "all" || 
        (availabilityFilter === "disponible" && doc.disponible) ||
        (availabilityFilter === "emprunte" && !doc.disponible)) &&
-      (rayonnageFilter === "all" || doc.rayonnage_id.toString() === rayonnageFilter) &&
-      (categorieFilter === "all" || doc.categorie_id.toString() === categorieFilter) &&
+      (rayonnageFilter === "all" || doc.categorie.rayonnage_id.toString() === rayonnageFilter) &&
+      (categorieFilter === "all" || doc.categorie.id.toString() === categorieFilter) &&
       (typeFilter === "all" || doc.type_id.toString() === typeFilter)
   );
 
   // Sort documents
   filteredDocuments.sort((a, b) => {
-    let aVal: any = a[sortBy as keyof typeof a];
-    let bVal: any = b[sortBy as keyof typeof b];
+    let aVal = a;
+    let bVal = b;
     
     if (typeof aVal === "string") {
       aVal = aVal.toLowerCase();
@@ -245,18 +238,14 @@ export function DocumentsList({allDocuments}:DocumentsListProps) {
       return aVal < bVal ? 1 : -1;
     }
   });
-
+console.log(rayonnageFilter)
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Gestion des Documents</CardTitle>
-            <Button className="gap-2" style={{ backgroundColor: "#147a40" }} onClick={() => {
-              setEditingDocument(null);
-              setFormData({ titre: "", description: "" });
-              setOpen(true);
-            }}>
+            <Button className="gap-2" style={{ backgroundColor: "#147a40" }} onClick={openCreateModal}>
               <Plus className="w-4 h-4" />
               Nouveau Document
             </Button>
@@ -392,36 +381,72 @@ export function DocumentsList({allDocuments}:DocumentsListProps) {
           </div>
         </CardContent>
       </Card>
-
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+      <Dialog open={open} onOpenChange={(open) => {
+        setOpen(open);
+        if (!open) closeEditModal();
+      }}>
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>{editingDocument ? "Modifier le Document" : "Nouveau Document"}</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmit}>
-            <div className="grid gap-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="titre">Titre</Label>
-                <Input
-                  id="titre"
-                  placeholder="Titre du document"
-                  value={formData.titre}
-                  onChange={(e) => setFormData({ ...formData, titre: e.target.value })}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
-                <Input
-                  id="description"
-                  placeholder="Description du document"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                />
-              </div>
+          <form className="space-y-4" onSubmit={handleSubmit}>
+
+            <div className="space-y-2">
+              <Label htmlFor="titre">Titre</Label>
+              <Input
+                id="titre"
+                placeholder="Titre du document"
+                value={data.titre}
+                onChange={(e) => setData({ ...data, titre: e.target.value })}
+                required
+              />
             </div>
-            <Button type="submit" style={{ backgroundColor: "#147a40" }}>
-              {editingDocument ? "Modifier" : "Ajouter"}
-            </Button>
+
+            <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
+              <Input
+                id="description"
+                placeholder="Description du document"
+                value={data.description}
+                onChange={(e) => setData({ ...data, description: e.target.value })}
+                required
+              />
+            </div>
+
+            <ComboInput
+              label="Rayonnage"
+              placeholder="Chercher ou saisir un rayonnage"
+              options={mockRayonnages.map((ray) => ({ id: ray.id, label: ray.nom }))}
+              textValue={data.rayonnage || ""}
+              selectedId={data.rayonnage_id?.toString() || ""}
+              onTextChange={(value) => setData((prev) => ({ ...prev, rayonnage: value, rayonnage_id: undefined }))}
+              onSelectOption={(option) => setData((prev) => ({ ...prev, rayonnage: option.label, rayonnage_id: option.id }))}
+            />
+
+            <ComboInput
+              label="Catégorie"
+              placeholder="Chercher ou saisir une catégorie"
+              options={mockCategories.map((cat) => ({ id: cat.id, label: cat.nom }))}
+              textValue={data.categorie || ""}
+              selectedId={data.categorie_id?.toString() || ""}
+              onTextChange={(value) => setData((prev) => ({ ...prev, categorie: value, categorie_id: undefined }))}
+              onSelectOption={(option) => setData((prev) => ({ ...prev, categorie: option.label, categorie_id: option.id }))}
+            />
+
+            <ComboInput
+              label="Type"
+              placeholder="Chercher ou saisir un type"
+              options={mockTypes.map((type) => ({ id: type.id, label: type.nom }))}
+              textValue={data.type || ""}
+              selectedId={data.type_id?.toString() || ""}
+              onTextChange={(value) => setData((prev) => ({ ...prev, type: value, type_id: undefined }))}
+              onSelectOption={(option) => setData((prev) => ({ ...prev, type: option.label, type_id: option.id }))}
+            />
+
+            <div className="flex justify-end gap-2 pt-2">
+              <Button type="button" variant="outline" onClick={closeCreateModal}>Annuler</Button>
+              <Button type="submit" disabled={processing}>{editingDocument ? "Modifier" : "Ajouter"}</Button>
+            </div>
           </form>
         </DialogContent>
       </Dialog>
@@ -433,7 +458,7 @@ export function DocumentsList({allDocuments}:DocumentsListProps) {
 
 
 // Assign the layout function to the Welcome component
-DocumentsList.layout = (page: ReactNode) => <Layout children={page} />;
+DocumentsList.layout = (page) => <Layout children={page} />;
 
 export default DocumentsList;
 

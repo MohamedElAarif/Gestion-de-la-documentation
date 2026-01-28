@@ -116,6 +116,6 @@
     "include": [
         "resources/js/**/*.ts",
         "resources/js/**/*.d.ts",
-        "resources/js/**/*.tsx",
+        "resources/js/**/*.tsx", "resources/js/pages/TypeDocumentList.jsx", "resources/js/pages/RayonnageList.jsx", "resources/js/pages/EmpruntsList.jsx", "resources/js/pages/CategorieList.jsx", "resources/js/pages/DocumentsList.jsx", "resources/js/pages/welcome.jsx",
     ]
 }
