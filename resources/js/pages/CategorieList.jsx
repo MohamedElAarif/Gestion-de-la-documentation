@@ -1,4 +1,3 @@
-import Layout from '../Layouts/Layout';
 import { useState } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -170,12 +169,6 @@ export function CategorieList({mockCategorie}) {
   );
 }
 
-
-
-
-
-// Assign the layout function to the Welcome component
-CategorieList.layout = (page) => <Layout children={page} />;
 
 export default CategorieList;
 

@@ -6,6 +6,8 @@ use App\Http\Controllers\EmpruntController;
 use App\Http\Controllers\MembreController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Auth\AdminAuthController;
+use App\Http\Controllers\RayonnageController;
+use App\Http\Controllers\Type_DocumentController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 

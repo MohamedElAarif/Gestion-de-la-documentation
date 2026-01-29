@@ -54,9 +54,9 @@ export function LayoutShell({
         () => [
             { id: "emprunts", label: "Emprunts", icon: BookOpen, href: "/Emprunts" },
             { id: "documents", label: "Documents", icon: FileText, href: "/Documents" },
-            { id: "rayonnage", label: "Rayonnage", icon: Grid3x3, href: "#" },
-            { id: "categorie", label: "Catégories", icon: FolderOpen, href: "#" },
-            { id: "typeDocument", label: "Types", icon: FileType, href: "#" },
+            { id: "rayonnage", label: "Rayonnages", icon: Grid3x3, href: "Rayonnages" },
+            { id: "categorie", label: "Catégories", icon: FolderOpen, href: "Categories" },
+            { id: "typeDocument", label: "Types", icon: FileType, href: "Type Documents" },
             { id: "membres", label: "Membres", icon: Users, href: "/Membres" },
             { id: "notification", label: "Notifications", icon: Bell, href: "/Notifications" },
         ],

@@ -1,4 +1,3 @@
-import Layout from '../Layouts/Layout';
 import { useState, useMemo, useEffect } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -11,33 +10,6 @@ import { Plus, Search, Pencil, Trash2, ArrowUpDown } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import {router, useForm } from '@inertiajs/react';
 
-const initialMockRayonnage = [
-  {
-    id: 1,
-    nom: "Section A - Sciences",
-    dateCreation: "2025-01-10",
-  },
-  {
-    id: 2,
-    nom: "Section B - Histoire",
-    dateCreation: "2025-01-10",
-  },
-  {
-    id: 3,
-    nom: "Section C - Littérature",
-    dateCreation: "2025-01-15",
-  },
-  {
-    id: 4,
-    nom: "Section D - Arts",
-    dateCreation: "2025-02-01",
-  },
-  {
-    id: 5,
-    nom: "Section E - Technologie",
-    dateCreation: "2025-03-12",
-  },
-];
 
 async function fetchData(url, mathod){
     const headers = { 
@@ -188,11 +160,6 @@ function  RayonnageList({mockRayonnage}) {
 }
 
 
-
-
-
-// Assign the layout function to the Welcome component
-RayonnageList.layout = (page) => <Layout children={page} />;
 
 export default RayonnageList;
 

@@ -1,6 +1,4 @@
-import Layout from '../Layouts/Layout';
 import { useState, useMemo, useEffect } from "react";
-// import type { ReactNode } from 'react';
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
@@ -10,9 +8,6 @@ import { Label } from "../ui/label";
 import { Plus, Search, Pencil, Trash2 } from "lucide-react";
 import {router, useForm } from '@inertiajs/react';
 
-// interface LayoutProps {
-//   children: ReactNode;
-// }
 
 async function fetchData(url, mathod){
     const headers = { 
@@ -180,9 +175,6 @@ function TypeDocumentList({mockTypeDocument}) {
 
 
 
-
-// Assign the layout function to the Welcome component
-TypeDocumentList.layout = (page) => <Layout children={page} />;
 
 export default TypeDocumentList;
 
