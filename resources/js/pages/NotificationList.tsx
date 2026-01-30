@@ -42,7 +42,7 @@ export function NotificationList() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const handleMarkAsRead = (id: number) => {
-    const updatedNotifications = notifications.map(notif => 
+    const updatedNotifications = notifications.map(notif =>
       notif.id === id ? { ...notif, lu: true } : notif
     );
     setNotifications(updatedNotifications);

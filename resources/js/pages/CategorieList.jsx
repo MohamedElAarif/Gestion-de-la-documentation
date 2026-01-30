@@ -5,32 +5,34 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Label } from "../ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Plus, Search, Pencil, Trash2 } from "lucide-react";
-import {router, useForm } from '@inertiajs/react';
+import { router, useForm } from '@inertiajs/react';
 
-async function fetchData(url, mathod){
-    const headers = { 
+async function fetchData(url, mathod) {
+  const headers = {
     Accept: "application/json",
-    };
-    const opts = { mathod, headers };
-    const res = await fetch(url, opts);
-    return await res.json();
+  };
+  const opts = { mathod, headers };
+  const res = await fetch(url, opts);
+  return await res.json();
 }
 
-export function CategorieList({mockCategorie}) {
+export function CategorieList({ mockCategorie, rayonnages }) {
   const [categories, setCategories] = useState(mockCategorie);
   const [searchQuery, setSearchQuery] = useState("");
   const [open, setOpen] = useState(false);
   const [editingCategorie, setEditingCategorie] = useState(null);
-  const {data,setData, post, put, delete:formDelete} = useForm({
+  const { data, setData, post, put, delete: formDelete } = useForm({
     nom: "",
     description: "",
+    rayonnage_id: rayonnages && rayonnages.length > 0 ? rayonnages[0].id.toString() : "",
   });
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (editingCategorie) {
-        put(`/Categories/${editingCategorie.id}`);
+      put(`/Categories/${editingCategorie.id}`);
     } else {
       post('/Categories');
     }
@@ -38,25 +40,25 @@ export function CategorieList({mockCategorie}) {
     setCategories(data);
     setOpen(false);
     setEditingCategorie(null);
-    setData({ nom: "", description: "" });
+    setData({ nom: "", description: "", rayonnage_id: rayonnages && rayonnages.length > 0 ? rayonnages[0].id.toString() : "" });
   };
 
   const handleEdit = (categorie) => {
     setEditingCategorie(categorie);
-    setData({ nom: categorie.nom, description: categorie.description });
+    setData({ nom: categorie.nom, description: categorie.description, rayonnage_id: categorie.rayonnage_id.toString() });
     setOpen(true);
   };
 
-  const handleDelete = async(id) => {
+  const handleDelete = async (id) => {
     if (confirm("Êtes-vous sûr de vouloir supprimer cette catégorie ?")) {
-        formDelete(`/Categories/${id}`);
+      formDelete(`/Categories/${id}`);
     }
     let data = await fetchData('/Categories/data', 'Get');
     setCategories(data);
   };
 
   const filteredCategories = categories.filter((cat) => {
-      return cat.nom.toLowerCase().includes(searchQuery.toLowerCase()) || cat.description.toLowerCase().includes(searchQuery.toLowerCase());
+    return cat.nom.toLowerCase().includes(searchQuery.toLowerCase()) || cat.description.toLowerCase().includes(searchQuery.toLowerCase());
   }
   );
 
@@ -68,7 +70,7 @@ export function CategorieList({mockCategorie}) {
             <CardTitle>Gestion des Catégories</CardTitle>
             <Button className="gap-2" style={{ backgroundColor: "#147a40" }} onClick={() => {
               setEditingCategorie(null);
-              setData({ nom: "", description: "" });
+              setData({ nom: "", description: "", rayonnage_id: rayonnages && rayonnages.length > 0 ? rayonnages[0].id.toString() : "" });
               setOpen(true);
             }}>
               <Plus className="w-4 h-4" />
@@ -94,6 +96,7 @@ export function CategorieList({mockCategorie}) {
                   <TableHead>ID</TableHead>
                   <TableHead>Nom</TableHead>
                   <TableHead>Description</TableHead>
+                  <TableHead>Rayonnage</TableHead>
                   <TableHead>Date de création</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
@@ -104,7 +107,8 @@ export function CategorieList({mockCategorie}) {
                     <TableCell>{cat.id}</TableCell>
                     <TableCell className="font-medium">{cat.nom}</TableCell>
                     <TableCell>{cat.description}</TableCell>
-                    <TableCell>{cat.dateCreation}</TableCell>
+                    <TableCell>{rayonnages?.find(r => r.id === cat.rayonnage_id)?.nom || '-'}</TableCell>
+                    <TableCell>{cat.date_creation}</TableCell>
                     <TableCell>
                       <div className="flex gap-2">
                         <Button
@@ -157,6 +161,21 @@ export function CategorieList({mockCategorie}) {
                   value={data.description}
                   onChange={(e) => setData({ ...data, description: e.target.value })}
                 />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="rayonnage_id">Rayonnage</Label>
+                <Select value={data.rayonnage_id} onValueChange={(value) => setData({ ...data, rayonnage_id: value })}>
+                  <SelectTrigger id="rayonnage_id">
+                    <SelectValue placeholder="Sélectionner un rayonnage" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {rayonnages && rayonnages.map((rayonnage) => (
+                      <SelectItem key={rayonnage.id} value={rayonnage.id.toString()}>
+                        {rayonnage.nom}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             <Button type="submit" style={{ backgroundColor: "#147a40" }}>

@@ -8,6 +8,7 @@ import {
     FileType,
     Users,
     Bell,
+    Settings,
 } from "lucide-react";
 import { Link, router } from "@inertiajs/react";
 
@@ -59,6 +60,7 @@ export function LayoutShell({
             { id: "typeDocument", label: "Types", icon: FileType, href: "Type Documents" },
             { id: "membres", label: "Membres", icon: Users, href: "/Membres" },
             { id: "notification", label: "Notifications", icon: Bell, href: "/Notifications" },
+            { id: "settings", label: "Paramètres", icon: Settings, href: "/Settings" },
         ],
         []
     );
@@ -77,7 +79,7 @@ export function LayoutShell({
 
                     {authUser ? (
                         <div className="flex items-center gap-3">
-                            <span className="text-sm text-gray-700">{authUser.name ?? authUser.email}</span>
+                            <span className="text-sm text-gray-700">Admin</span>
                             <button
                                 type="button"
                                 onClick={logout}
@@ -107,9 +109,8 @@ export function LayoutShell({
                                         }
                                     }}
                                     aria-disabled={disabled}
-                                    className={`flex items-center gap-2 px-1 py-2 text-sm transition-colors ${
-                                        isActive ? "text-gray-900 border-b-2" : "text-gray-600 hover:text-gray-900"
-                                    } ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
+                                    className={`flex items-center gap-2 px-1 py-2 text-sm transition-colors ${isActive ? "text-gray-900 border-b-2" : "text-gray-600 hover:text-gray-900"
+                                        } ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
                                     style={isActive ? { borderColor: "#147a40" } : undefined}
                                 >
                                     <Icon className="h-4 w-4" />

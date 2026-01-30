@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Categorie;
+use App\Models\Rayonnage;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -12,9 +13,11 @@ class CategorieController extends Controller
     public function index()
     {
         $mockCategorie = Categorie::all();
+        $rayonnages = Rayonnage::all();
 
         return Inertia::render('CategorieList',[
             'mockCategorie' => $mockCategorie,
+            'rayonnages' => $rayonnages,
         ]);
     }
     public function indexData(Request $request): JsonResponse
@@ -31,13 +34,14 @@ class CategorieController extends Controller
     }
     public function store(Request $request)
     {
-        $categorie = new Categorie();
-        $categorie->nom = $request->nom;
-        $categorie->description = $request->description;
-        $categorie->rayonnage_id = 1;
-        $categorie->save();
-        return redirect()->back()->with('success', 'Categorie created successfully!');
+        $validated = $request->validate([
+            'nom' => 'required|string|max:255',
+            'description' => 'nullable|string|max:1000',
+            'rayonnage_id' => 'required|exists:rayonnages,id',
+        ]);
 
+        $categorie = Categorie::create($validated);
+        return redirect()->back()->with('success', 'Categorie created successfully!');
     }
     public function destroy($id)
     {
@@ -48,12 +52,14 @@ class CategorieController extends Controller
     }
     public function update(Request $request, $id)
     {
-        $categorie = Categorie::findOrFail($id);
-        $categorie->update([
-            'nom' => $request->nom,
-            'description' => $request->description,
-            'rayonnage_id' => 1,
+        $validated = $request->validate([
+            'nom' => 'required|string|max:255',
+            'description' => 'nullable|string|max:1000',
+            'rayonnage_id' => 'required|exists:rayonnages,id',
         ]);
+
+        $categorie = Categorie::findOrFail($id);
+        $categorie->update($validated);
         return redirect()->back()->with('success', 'Categorie updated successfully!');
     }
 }

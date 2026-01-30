@@ -18,7 +18,7 @@ class AdminAuthController extends Controller
 	public function store(Request $request)
 	{
 		$credentials = $request->validate([
-			'email' => ['required', 'email'],
+			'login' => ['required', 'string'],
 			'password' => ['required', 'string'],
 			'remember' => ['sometimes', 'boolean'],
 		]);
@@ -28,7 +28,7 @@ class AdminAuthController extends Controller
 
 		if (! Auth::attempt($credentials, $remember)) {
 			throw ValidationException::withMessages([
-				'email' => __('These credentials do not match our records.'),
+				'login' => __('These credentials do not match our records.'),
 			]);
 		}
 

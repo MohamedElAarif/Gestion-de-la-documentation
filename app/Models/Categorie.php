@@ -16,6 +16,13 @@ class Categorie extends Model
         'rayonnage_id',
     ];
 
+    protected $appends = ['date_creation'];
+
+    public function getDateCreationAttribute($value)
+    {
+        return $value ?: ($this->created_at ? $this->created_at->format('Y-m-d') : null);
+    }
+
     public function rayonnage()
     {
         return $this->belongsTo(Rayonnage::class);

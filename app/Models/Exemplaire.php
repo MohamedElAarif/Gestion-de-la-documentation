@@ -24,6 +24,13 @@ class Exemplaire extends Model
         'date_creation' => 'date',
     ];
 
+    protected $appends = ['date_creation'];
+
+    public function getDateCreationAttribute($value)
+    {
+        return $value ?: ($this->created_at ? $this->created_at->format('Y-m-d') : null);
+    }
+
     public function document()
     {
         return $this->belongsTo(Document::class);

@@ -8,6 +8,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Auth\AdminAuthController;
 use App\Http\Controllers\RayonnageController;
 use App\Http\Controllers\Type_DocumentController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -62,6 +63,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/Notifications/mark-all-read', [NotificationController::class, 'markAllRead'])->name('notifications.markAllRead');
     Route::patch('/Notifications/{notification}/mark-read', [NotificationController::class, 'markRead'])->name('notifications.markRead');
     Route::delete('/Notifications/{notification}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
+    
+    Route::get('/Settings', [ProfileController::class, 'edit'])->name('settings.edit');
+    Route::put('/Settings/password', [ProfileController::class, 'updatePassword'])->name('password.update');
 });
 
 Route::get('/Rayonnages', [RayonnageController::class, 'index'])->name('rayonnages');

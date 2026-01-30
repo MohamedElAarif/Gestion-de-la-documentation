@@ -28,6 +28,13 @@ class Document extends Model
         'is_archived' => 'boolean',
     ];
 
+    protected $appends = ['dateCreation'];
+
+    public function getDateCreationAttribute()
+    {
+        return $this->created_at ? $this->created_at->format('Y-m-d') : null;
+    }
+
     public function categorie()
     {
         return $this->belongsTo(Categorie::class);

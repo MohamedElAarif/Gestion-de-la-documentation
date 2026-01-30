@@ -32,8 +32,8 @@ class DocumentFactory extends Factory
             ?? Type_Document::factory()->create();
 
         return [
-            'titre' => fake()->sentence(3),
-            'description' => fake()->paragraph(),
+            'titre' => fake()->sentence(2),
+            'description' => fake()->sentence(3),
             'date_achat' => fake()->dateTimeBetween('-10 years', 'now'),
             'disponible' => true,
             'is_archived' => fake()->boolean(5),

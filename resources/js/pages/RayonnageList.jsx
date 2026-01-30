@@ -8,35 +8,35 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Label } from "../ui/label";
 import { Plus, Search, Pencil, Trash2, ArrowUpDown } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import {router, useForm } from '@inertiajs/react';
+import { router, useForm } from '@inertiajs/react';
 
 
-async function fetchData(url, mathod){
-    const headers = { 
+async function fetchData(url, mathod) {
+  const headers = {
     Accept: "application/json",
-    };
-    const opts = { mathod, headers };
-    const res = await fetch(url, opts);
-    return await res.json();
+  };
+  const opts = { mathod, headers };
+  const res = await fetch(url, opts);
+  return await res.json();
 }
 
-function  RayonnageList({mockRayonnage}) {
+function RayonnageList({ mockRayonnage }) {
   const [rayonnages, setRayonnages] = useState(mockRayonnage);
   const [searchQuery, setSearchQuery] = useState("");
   const [open, setOpen] = useState(false);
   const [editingRayonnage, setEditingRayonnage] = useState(null);
-  const {data,setData, post, put, delete:formDelete} = useForm({
+  const { data, setData, post, put, delete: formDelete } = useForm({
     nom: "",
   });
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (editingRayonnage) {
-        put(`/Rayonnages/${editingRayonnage.id}`);
+      put(`/Rayonnages/${editingRayonnage.id}`);
     } else {
-        post('/Rayonnages')
+      post('/Rayonnages')
     }
-    let data = await fetchData('/Rayonnages/data','Get');
+    let data = await fetchData('/Rayonnages/data', 'Get');
     setRayonnages(data);
     setOpen(false);
     setEditingRayonnage(null);
@@ -49,11 +49,11 @@ function  RayonnageList({mockRayonnage}) {
     setOpen(true);
   };
 
-  const handleDelete = async(id) => {
+  const handleDelete = async (id) => {
     if (confirm("Êtes-vous sûr de vouloir supprimer ce rayonnage ?")) {
-        formDelete(`/Rayonnages/${id}`);
-        let data = await fetchData(`/Rayonnages/data`, 'Get');
-        setRayonnages(data);
+      formDelete(`/Rayonnages/${id}`);
+      let data = await fetchData(`/Rayonnages/data`, 'Get');
+      setRayonnages(data);
     }
   };
 

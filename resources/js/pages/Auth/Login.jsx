@@ -5,7 +5,7 @@ export default function Login() {
 	const { props } = usePage();
 	const errors = props?.errors || {};
 
-	const [email, setEmail] = useState('');
+	const [login, setLogin] = useState('');
 	const [password, setPassword] = useState('');
 	const [remember, setRemember] = useState(false);
 	const [processing, setProcessing] = useState(false);
@@ -22,7 +22,7 @@ export default function Login() {
 		setProcessing(true);
 		router.post(
 			'/login',
-			{ email, password, remember },
+			{ login, password, remember },
 			{
 				onFinish: () => setProcessing(false),
 				preserveScroll: true,
@@ -51,11 +51,11 @@ export default function Login() {
 				<form onSubmit={submit}>
 					<div style={{ display: 'grid', gap: 10 }}>
 						<label style={{ display: 'grid', gap: 6 }}>
-							<span style={{ fontSize: 13, color: 'rgba(229,231,235,0.8)' }}>Email</span>
+							<span style={{ fontSize: 13, color: 'rgba(229,231,235,0.8)' }}>Login</span>
 							<input
-								type="email"
-								value={email}
-								onChange={(e) => setEmail(e.target.value)}
+								type="text"
+								value={login}
+								onChange={(e) => setLogin(e.target.value)}
 								required
 								autoFocus
 								style={{
@@ -68,8 +68,8 @@ export default function Login() {
 									outline: 'none',
 								}}
 							/>
-							{errors.email ? (
-								<small style={{ color: '#fca5a5' }}>{errors.email}</small>
+							{errors.login ? (
+								<small style={{ color: '#fca5a5' }}>{errors.login}</small>
 							) : null}
 						</label>
 

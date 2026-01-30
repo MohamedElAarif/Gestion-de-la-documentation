@@ -6,24 +6,24 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Label } from "../ui/label";
 import { Plus, Search, Pencil, Trash2 } from "lucide-react";
-import {router, useForm } from '@inertiajs/react';
+import { router, useForm } from '@inertiajs/react';
 
 
-async function fetchData(url, mathod){
-    const headers = { 
+async function fetchData(url, mathod) {
+  const headers = {
     Accept: "application/json",
-    };
-    const opts = { mathod, headers };
-    const res = await fetch(url, opts);
-    return await res.json();
+  };
+  const opts = { mathod, headers };
+  const res = await fetch(url, opts);
+  return await res.json();
 };
 
-function TypeDocumentList({mockTypeDocument}) {
+function TypeDocumentList({ mockTypeDocument }) {
   const [types, setTypes] = useState(mockTypeDocument);
   const [searchQuery, setSearchQuery] = useState("");
   const [open, setOpen] = useState(false);
   const [editingType, setEditingType] = useState(null);
-  const {data,setData, post, put, delete:formDelete} = useForm({
+  const { data, setData, post, put, delete: formDelete } = useForm({
     nom: "",
     description: "",
   });
@@ -36,7 +36,7 @@ function TypeDocumentList({mockTypeDocument}) {
     } else {
       post('/Type Documents');
     }
-    let data = await fetchData('/Type Documents/data','Get');
+    let data = await fetchData('/Type Documents/data', 'Get');
     setTypes(data);
     setOpen(false);
     setEditingType(null);
@@ -52,7 +52,7 @@ function TypeDocumentList({mockTypeDocument}) {
   const handleDelete = async (id) => {
     if (confirm("Êtes-vous sûr de vouloir supprimer ce type de document ?")) {
       formDelete(`/Type Documents/${id}`);
-      let data = await fetchData('/Type Documents/data','Get');
+      let data = await fetchData('/Type Documents/data', 'Get');
       setTypes(data);
     }
   };

@@ -7,12 +7,17 @@ import AppLayout from './Layouts/AppLayout';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
-const pages = import.meta.glob('./pages/**/*.jsx');
+const pages = import.meta.glob('./pages/**/*.{jsx,tsx}');
 
 createInertiaApp({
     title: (title) => title ? `${title} - ${appName}` : appName,
     resolve: async (name) => {
-        const page: any = await resolvePageComponent(`./pages/${name}.jsx`, pages);
+        let page: any;
+        try {
+            page = await resolvePageComponent(`./pages/${name}.jsx`, pages);
+        } catch (error) {
+            page = await resolvePageComponent(`./pages/${name}.tsx`, pages);
+        }
 
         // Apply the main Layout to all pages except the login page.
         if (name !== 'Auth/Login') {

@@ -22,7 +22,7 @@ class CategorieFactory extends Factory
 
         return [
             'nom' => fake()->unique()->words(2, true),
-            'description' => fake()->paragraph(),
+            'description' => fake()->sentence(3),
             'date_creation' => fake()->dateTimeBetween('-5 years', 'now'),
             'rayonnage_id' => $rayonnageId,
         ];
