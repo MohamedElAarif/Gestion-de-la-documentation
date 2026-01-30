@@ -149,7 +149,7 @@ export default function MembreList() {
       ].some((value) => value?.toLowerCase().includes(q));
     });
   }, [membres, searchQuery]);
-  return (<div className="p-6 space-y-6">
+  return (<div className="space-y-6">
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">

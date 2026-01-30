@@ -696,12 +696,12 @@ export default function EmpruntsList() {
     w.print();
   };
   return (<div>
-    <div className="p-6 space-y-6">
+    <div className="space-y-6">
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Gestion des Emprunts</CardTitle>
-            <Button className="gap-2" onClick={openCreateModal}>
+            <Button className="gap-2" style={{ backgroundColor: "#147a40" }} onClick={openCreateModal}>
               <Plus className="w-4 h-4" /> Nouvel Emprunt
             </Button>
           </div>

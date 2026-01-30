@@ -162,7 +162,7 @@ export default function NotificationList() {
     const unreadCount = useMemo(() => notifications.filter((notif) => !notif.est_lu).length, [notifications]);
 
     return (
-        <div className="p-6 space-y-6">
+        <div className="space-y-6">
             <Card>
                 <CardHeader>
                     <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
